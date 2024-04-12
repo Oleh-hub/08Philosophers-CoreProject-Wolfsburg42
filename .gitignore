@@ -1,0 +1,7 @@
+*.dSYM/
+obj/
+*.out
+test
+philo
+*.o
+GetTmOfDay
