@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/12 15:34:11 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/12 20:41:48 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static long int time_ms(void)
 }
 
 // sleeps for the time, indicated by variable time in ms
-// usleep > 10 leads to delays of ft_msleep in 1 milliseconds for 
+// usleep > 10 leads 2 ft_msleep  delays, 1 ms for every 200 ms twice in 5 cases
 void ft_msleep(long int time) 
 {
 	long int	start;
@@ -49,7 +49,6 @@ void	*phl_thrd(void	*arg)
 {
 	t_philo	*philo;
 	int		i;
-	// long int tmp;
 	
 	philo = (t_philo *)arg;
 	philo->tm_start = time_ms();
@@ -69,40 +68,76 @@ void	*phl_thrd(void	*arg)
 	return (NULL);
 }
 
+t_args	*args_init(t_args *args)
+{
+	int			i;
+	
+	args->numbr_p = 5;			// number_of_philosophers
+	args->t2eat_p = 200; 		// time_to_eat_in_ms
+	args->t2slp_p = 200; 		// time_to_sleep_in_ms
+	args->times_p = 5;
+	args->fork = calloc(args->numbr_p, sizeof(int));
+	if (!args->fork)
+		return (NULL);
+	args->fork_m = calloc(args->numbr_p, sizeof(pthread_mutex_t));
+	if (!args->fork_m)
+		return (free(args->fork), NULL);
+	if (pthread_mutex_init(&args->print_mid, NULL))
+		return (free(args->fork),free(args->fork_m), NULL);
+	i = -1;
+	while (++i < args->numbr_p)
+	{
+		if (pthread_mutex_init(&args->fork_m[i], NULL))
+		{
+			while (--i >= 0)
+				pthread_mutex_destroy(&args->fork_m[i]);
+			pthread_mutex_destroy(&args->print_mid);
+			return (free(args->fork), free(args->fork_m), NULL); 
+		}
+	}
+	return (args);
+}
+
+void args_destroy(t_args *args)
+{
+	int i;
+
+	i = -1;
+	while (++i < args->numbr_p)
+		pthread_mutex_destroy(&args->fork_m[i]);
+	pthread_mutex_destroy(&args->print_mid);
+	free(args->fork);
+	free(args->fork_m);
+}
+
 int	main(void)
 {
 	t_args		args;
 	int			i;
 	t_philo		*philo;
 
-	// struct args initialization
-	args.numbr_p = 5;			// number_of_philosophers
-	args.t2eat_p = 200; 		// time_to_eat_in_ms
-	args.t2slp_p = 200; 		// time_to_sleep_in_ms
-	args.times_p = 5;
-	if (pthread_mutex_init(&args.print_mid, NULL))
+	if (!args_init(&args)) // struct args initialization
 		return (1);
 	philo = calloc(args.numbr_p, sizeof(t_philo));
 	if (!philo)
-		return (pthread_mutex_destroy(&args.print_mid), 3);
+		return (args_destroy(&args), 3);
 	philo->args = &args;
-	i = 0;
-	while (i < args.numbr_p)
+	i = -1;
+	while (++i < args.numbr_p)
 	{
 		philo[i].id = i;
 		philo[i].args = &args;
-		if (pthread_create(&philo[i].thread_id, NULL, phl_thrd, (void *) &philo[i]))
-			return (pthread_mutex_destroy(&args.print_mid), free(philo), 3);
-		i++;
+		if (pthread_create(&philo[i].thread_id, NULL, phl_thrd, 
+			(void *) &philo[i]))
+				return (args_destroy(&args), free(philo), 4);
 	}
-	i = 0;
-	while (i < args.numbr_p)
+	i = -1;
+	while (++i < args.numbr_p)
 	{
 		pthread_join(philo[i].thread_id, NULL);
 		printf("Thread of philosopher %d is joined\n", i);
-		i++;
 	}
-	pthread_mutex_destroy(&args.print_mid);
+	args_destroy(&args); // struct args destruction
 	free(philo);
 	return (0);
 }
