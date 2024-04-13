@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/13 10:05:40 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/13 21:13:10 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void	ft_msleep(long int time)
 
 // philosophers life cycle
 // function, that is executed by the thread of the philosopher
+// the last philosopher takes the first fork and then the fork of philosopher [0]
 void	*phl_thrd(void	*arg)
 {
 	t_philo	*philo;
@@ -55,12 +56,38 @@ void	*phl_thrd(void	*arg)
 	i = 0;
 	while (1)
 	{
-		ft_printf_out(time_ms() - philo->tm_start, philo, "is eating");
-		ft_msleep(philo->args->t2eat_p);
-		ft_printf_out(time_ms() - philo->tm_start, philo, "is sleeping");
-		ft_msleep(philo->args->t2slp_p);
-		ft_printf_out(time_ms() - philo->tm_start, philo, "is thinking");
-		ft_msleep(200);
+		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
+		if (philo->id == philo->args->numbr_p - 1)
+			pthread_mutex_lock(&philo->args->fork_m[0]);
+		else
+			pthread_mutex_lock(&philo->args->fork_m[philo->id + 1]);
+		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
+		{
+			philo->args->fork[philo->id] = 1;
+			ft_printf_out(time_ms() - philo->tm_start, philo, "has taken the left fork");
+			philo->args->fork[philo->id + 1] = 1;
+			ft_printf_out(time_ms() - philo->tm_start, philo, "has taken the right fork");
+			ft_printf_out(time_ms() - philo->tm_start, philo, "is eating");
+			ft_msleep(philo->args->t2eat_p);
+			philo->args->fork[philo->id] = 0;
+			philo->args->fork[philo->id + 1] = 0;
+			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
+			if (philo->id == philo->args->numbr_p - 1)
+				pthread_mutex_unlock(&philo->args->fork_m[0]);
+			else
+				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+			ft_printf_out(time_ms() - philo->tm_start, philo, "is sleeping");
+			ft_msleep(philo->args->t2slp_p);
+		}
+		else
+		{
+			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
+			if (philo->id == philo->args->numbr_p - 1)
+				pthread_mutex_unlock(&philo->args->fork_m[0]);
+			else
+				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+			ft_printf_out(time_ms() - philo->tm_start, philo, "is thinking");
+		}
 		i++;
 		if (philo->args->times_p && i == philo->args->times_p)
 			break ;
