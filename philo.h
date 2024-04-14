@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/13 10:08:05 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/14 19:02:20 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,14 @@ typedef struct s_args
 	/// CREATED BUT STILL NOT USED!!!!: 
 	pthread_mutex_t	*fork_m; // an array of mutexes (fork[numbr_p]) 4 every fork
 	pthread_mutex_t	print_mid; // mutex id 2 garantee no data race during printf
+	struct timeval time;
 }				t_args;
 
 typedef struct s_philo
 {
 	int			id;			// id of the philosopher
 	long int	tm_start;	// start time of the philosophers thread
+	long int	tm_lmeal;	// time of the last meal || hunger life span begin
 	pthread_t	thread_id;	// thread id of the philosopher
 	t_args		*args;		// pointer to the arguments structure
 }				t_philo;

@@ -6,18 +6,11 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/13 21:13:10 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/14 19:05:20 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-static void	ft_printf_out(long int time, t_philo *philo, char *str)
-{
-	pthread_mutex_lock(&(philo->args->print_mid));
-	printf("%ld %d %s\n", time, philo->id, str);
-	pthread_mutex_unlock(&philo->args->print_mid);
-}
 
 // returns time, passed sincse 1.01.1970 in ms
 static long int	time_ms(void)
@@ -43,6 +36,25 @@ void	ft_msleep(long int time)
 	}
 }
 
+long	get_time(struct timeval time)
+{
+	struct timeval	now;
+	int				diff;
+
+	gettimeofday(&now, NULL);
+	diff = (now.tv_sec * 1000 + now.tv_usec / 1000) - (time.tv_sec * 1000
+			+ time.tv_usec / 1000);
+	return (diff);
+}
+
+// mutexed print out the philosopher's actions
+static void	ft_printf_out(t_philo *philo, char *str)
+{
+	pthread_mutex_lock(&(philo->args->print_mid));
+	printf("%ld %d %s\n", get_time(philo->args->time), philo->id, str);
+	pthread_mutex_unlock(&philo->args->print_mid);
+}
+
 // philosophers life cycle
 // function, that is executed by the thread of the philosopher
 // the last philosopher takes the first fork and then the fork of philosopher [0]
@@ -52,7 +64,8 @@ void	*phl_thrd(void	*arg)
 	int		i;
 
 	philo = (t_philo *)arg;
-	philo->tm_start = time_ms();
+	philo->tm_start = time_ms(); //this time the mixed up output, I think
+	philo->tm_lmeal = time_ms();
 	i = 0;
 	while (1)
 	{
@@ -64,10 +77,10 @@ void	*phl_thrd(void	*arg)
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
 		{
 			philo->args->fork[philo->id] = 1;
-			ft_printf_out(time_ms() - philo->tm_start, philo, "has taken the left fork");
+			ft_printf_out(philo, "has taken the left fork");
 			philo->args->fork[philo->id + 1] = 1;
-			ft_printf_out(time_ms() - philo->tm_start, philo, "has taken the right fork");
-			ft_printf_out(time_ms() - philo->tm_start, philo, "is eating");
+			ft_printf_out( philo, "has taken the right fork");
+			ft_printf_out(philo, "is eating");
 			ft_msleep(philo->args->t2eat_p);
 			philo->args->fork[philo->id] = 0;
 			philo->args->fork[philo->id + 1] = 0;
@@ -76,7 +89,7 @@ void	*phl_thrd(void	*arg)
 				pthread_mutex_unlock(&philo->args->fork_m[0]);
 			else
 				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
-			ft_printf_out(time_ms() - philo->tm_start, philo, "is sleeping");
+			ft_printf_out(philo, "is sleeping");
 			ft_msleep(philo->args->t2slp_p);
 		}
 		else
@@ -86,7 +99,7 @@ void	*phl_thrd(void	*arg)
 				pthread_mutex_unlock(&philo->args->fork_m[0]);
 			else
 				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
-			ft_printf_out(time_ms() - philo->tm_start, philo, "is thinking");
+			ft_printf_out(philo, "is thinking");
 		}
 		i++;
 		if (philo->args->times_p && i == philo->args->times_p)
@@ -122,6 +135,7 @@ t_args	*args_init(t_args *args)
 			return (free(args->fork), free(args->fork_m), NULL);
 		}
 	}
+	gettimeofday(&args->time, NULL);
 	return (args);
 }
 
