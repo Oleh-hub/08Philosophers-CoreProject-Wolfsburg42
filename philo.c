@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/14 19:05:20 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/15 15:43:20 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void	ft_msleep(long int time)
 	}
 }
 
+// returns ms passed since the time given as the argument
 long	get_time(struct timeval time)
 {
 	struct timeval	now;
@@ -62,13 +63,24 @@ void	*phl_thrd(void	*arg)
 {
 	t_philo	*philo;
 	int		i;
-
+	
 	philo = (t_philo *)arg;
-	philo->tm_start = time_ms(); //this time the mixed up output, I think
-	philo->tm_lmeal = time_ms();
-	i = 0;
+	i = -1;
 	while (1)
 	{
+		if ((++i == philo->args->times_p && philo->args->times_p) ||
+			 philo->args->died )
+				break ;
+		if (philo->id % 2 && i == 0) // uneven philos(1, 3... start with a delay
+			ft_msleep(3);
+		// if (philo->id == 0 || philo->id == 2)
+		// 	;
+		if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
+		{
+			philo->args->died = 1;
+			ft_printf_out(philo, "died");
+			break ;
+		}
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		if (philo->id == philo->args->numbr_p - 1)
 			pthread_mutex_lock(&philo->args->fork_m[0]);
@@ -80,6 +92,8 @@ void	*phl_thrd(void	*arg)
 			ft_printf_out(philo, "has taken the left fork");
 			philo->args->fork[philo->id + 1] = 1;
 			ft_printf_out( philo, "has taken the right fork");
+			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
+				return (NULL);
 			ft_printf_out(philo, "is eating");
 			ft_msleep(philo->args->t2eat_p);
 			philo->args->fork[philo->id] = 0;
@@ -101,9 +115,6 @@ void	*phl_thrd(void	*arg)
 				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
 			ft_printf_out(philo, "is thinking");
 		}
-		i++;
-		if (philo->args->times_p && i == philo->args->times_p)
-			break ;
 	}
 	return (NULL);
 }
@@ -112,10 +123,37 @@ t_args	*args_init(t_args *args)
 {
 	int			i;
 
-	args->numbr_p = 5;
+	// Test 1 800 200 200. The philosopher should not eat and should die.
+	// But it does not work with 1 philosopher: 
+	// args->numbr_p = 1;
+	// args->t2die_p = 800;
+	// args->t2eat_p = 200;
+	// args->t2slp_p = 200;
+	// args->times_p = 0;
+	// Test 4 310 200 100. One philosopher should die. but DOES NOT: 
+	args->numbr_p = 4;
+	args->t2die_p = 310;
+	args->t2eat_p = 200;
+	args->t2slp_p = 100;
+	args->times_p = 0;
+	// next ones r ok:
+/* 	args->numbr_p = 5;
+	args->t2die_p = 800;
+	args->t2eat_p = 200;
+	args->t2slp_p = 200; 
+	args->times_p = 0; */
+	/* args->numbr_p = 5;
+	args->t2die_p = 800;
 	args->t2eat_p = 200;
 	args->t2slp_p = 200;
-	args->times_p = 5;
+	args->times_p = 7; */
+	/* args->numbr_p = 4;
+	args->t2die_p = 410;
+	args->t2eat_p = 200;
+	args->t2slp_p = 200;
+	args->times_p = 0; */
+	// args->times_p = 0;
+	args->died = 0;
 	args->fork = calloc(args->numbr_p, sizeof(int));
 	if (!args->fork)
 		return (NULL);
@@ -135,7 +173,14 @@ t_args	*args_init(t_args *args)
 			return (free(args->fork), free(args->fork_m), NULL);
 		}
 	}
-	gettimeofday(&args->time, NULL);
+	i = -1;
+	if (gettimeofday(&args->time, NULL) == -1)
+	{
+		while (++i < args->numbr_p)
+			pthread_mutex_destroy(&args->fork_m[i]);
+		pthread_mutex_destroy(&args->print_mid);
+		return (free(args->fork), free(args->fork_m), NULL);
+	}
 	return (args);
 }
 
@@ -168,6 +213,7 @@ int	main(void)
 	{
 		philo[i].id = i;
 		philo[i].args = &args;
+		philo[i].tm_lmeal = args.time;
 		if (pthread_create(&philo[i].thread_id, NULL, phl_thrd,
 				(void *) &philo[i]))
 			return (args_destroy(&args), free(philo), 4);
