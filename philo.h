@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/15 13:50:24 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/15 20:08:21 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_args
 	int				*fork;	// the array of forks may == 0 or 1 only. Needed 
 	int				died;		// flag of the death of a philosopher
 	// because U "should protect the forks state with a mutex for each of them."
+	pthread_mutex_t	died_status; // 2 allow change 'int died' without data race
 	pthread_mutex_t	*fork_m; // an array of mutexes (fork[numbr_p]) 4 every fork
 	pthread_mutex_t	print_mid; // mutex id 2 garantee no data race during printf
 	struct timeval time; // start time of the simulation (a la Beqa)

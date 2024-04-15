@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/15 15:43:20 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/15 20:47:53 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,36 @@ static void	ft_printf_out(t_philo *philo, char *str)
 	pthread_mutex_unlock(&philo->args->print_mid);
 }
 
+// check if the philosopher is alive
+int is_alive(t_philo *philo)
+{
+	// int current_time;
+	
+	// current_time = get_time(philo->tm_lmeal); // get time since thelast meal
+	// if (philo->id == 0 || philo->id == 2)	//
+	// 	printf("%i: %i %i\n", philo->id, current_time, philo->args->t2die_p); //
+	// if (current_time > philo->args->t2die_p)
+	if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
+	{
+		pthread_mutex_lock(&(philo->args->died_status));
+		philo->args->died = 1;
+		pthread_mutex_unlock(&philo->args->died_status);
+		ft_printf_out(philo, "has died");
+		return (0);
+	}
+	return (1);
+}
+
+// unlocking philos forks considering the last philosopher
+void fork_mutex_unlock(t_philo *philo)
+{
+	pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
+	if (philo->id == philo->args->numbr_p - 1)
+		pthread_mutex_unlock(&philo->args->fork_m[0]);
+	else
+		pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+}
+
 // philosophers life cycle
 // function, that is executed by the thread of the philosopher
 // the last philosopher takes the first fork and then the fork of philosopher [0]
@@ -68,24 +98,29 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
-		if ((++i == philo->args->times_p && philo->args->times_p) ||
-			 philo->args->died )
-				break ;
-		if (philo->id % 2 && i == 0) // uneven philos(1, 3... start with a delay
-			ft_msleep(3);
-		// if (philo->id == 0 || philo->id == 2)
-		// 	;
-		if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
+		pthread_mutex_lock(&(philo->args->died_status)); // if sombody died
+		if (philo->args->died)
 		{
-			philo->args->died = 1;
-			ft_printf_out(philo, "died");
+			pthread_mutex_unlock(&philo->args->died_status);
 			break ;
 		}
+		else
+			pthread_mutex_unlock(&philo->args->died_status); // end if
+			
+		if (++i == philo->args->times_p && philo->args->times_p)
+			break ;
+		if (philo->id % 2 && i == 0) // uneven philos(1, 3... start with a delay
+			ft_msleep(3);
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		if (philo->id == philo->args->numbr_p - 1)
 			pthread_mutex_lock(&philo->args->fork_m[0]);
 		else
 			pthread_mutex_lock(&philo->args->fork_m[philo->id + 1]);
+		if (!is_alive(philo))
+		{
+			fork_mutex_unlock(philo);
+			return (NULL);
+		}
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
 		{
 			philo->args->fork[philo->id] = 1;
@@ -98,11 +133,7 @@ void	*phl_thrd(void	*arg)
 			ft_msleep(philo->args->t2eat_p);
 			philo->args->fork[philo->id] = 0;
 			philo->args->fork[philo->id + 1] = 0;
-			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
-			if (philo->id == philo->args->numbr_p - 1)
-				pthread_mutex_unlock(&philo->args->fork_m[0]);
-			else
-				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+			fork_mutex_unlock(philo);
 			ft_printf_out(philo, "is sleeping");
 			ft_msleep(philo->args->t2slp_p);
 		}
@@ -162,6 +193,11 @@ t_args	*args_init(t_args *args)
 		return (free(args->fork), NULL);
 	if (pthread_mutex_init(&args->print_mid, NULL))
 		return (free(args->fork), free(args->fork_m), NULL);
+	if (pthread_mutex_init(&args->died_status, NULL))
+	{
+		pthread_mutex_destroy(&args->print_mid);
+		return (free(args->fork), free(args->fork_m), NULL);
+	}
 	i = -1;
 	while (++i < args->numbr_p)
 	{
@@ -170,6 +206,7 @@ t_args	*args_init(t_args *args)
 			while (--i >= 0)
 				pthread_mutex_destroy(&args->fork_m[i]);
 			pthread_mutex_destroy(&args->print_mid);
+			pthread_mutex_destroy(&args->died_status);
 			return (free(args->fork), free(args->fork_m), NULL);
 		}
 	}
@@ -179,8 +216,10 @@ t_args	*args_init(t_args *args)
 		while (++i < args->numbr_p)
 			pthread_mutex_destroy(&args->fork_m[i]);
 		pthread_mutex_destroy(&args->print_mid);
+		pthread_mutex_destroy(&args->died_status);
 		return (free(args->fork), free(args->fork_m), NULL);
 	}
+
 	return (args);
 }
 
@@ -192,6 +231,7 @@ void	args_destroy(t_args *args)
 	while (++i < args->numbr_p)
 		pthread_mutex_destroy(&args->fork_m[i]);
 	pthread_mutex_destroy(&args->print_mid);
+	pthread_mutex_destroy(&args->died_status);
 	free(args->fork);
 	free(args->fork_m);
 }
