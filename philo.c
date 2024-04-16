@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/16 12:24:47 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/16 17:41:09 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,11 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
-		// if (!is_alive(philo))
-		// 	break;
+		if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
+			break;
 		pthread_mutex_lock(&(philo->args->died_status)); // if sombody died
-		if (philo->id == 0)						// trace
-			ft_printf_out(philo, "tracing");	// trace	
+		// if (philo->id == 0)						// trace
+		// 	ft_printf_out(philo, "tracing");	// trace	
 		if (philo->args->died)
 			return (pthread_mutex_unlock(&philo->args->died_status), NULL) ;
 		else
@@ -156,45 +156,31 @@ void	*phl_thrd(void	*arg)
 	return (NULL);
 }
 
-t_args	*args_init(t_args *args)
+// converts the string to an integer
+int ft_itoa(char *av)
+{
+	int i;
+	int num;
+
+	if (!av)
+		return (0);
+	i = -1;
+	num = 0;
+	while (av[++i])
+		num = num * 10 + av[i] - '0';
+	return (num);
+}
+
+// init the arguments structure
+t_args	*args_init(t_args *args, char **av)
 {
 	int			i;
 
-	// Test 1 800 200 200. The philosopher should not eat and should die.
-	// But it does not work with 1 philosopher: 
-	// args->numbr_p = 1;
-	// args->t2die_p = 800;
-	// args->t2eat_p = 200;
-	// args->t2slp_p = 200;
-	// args->times_p = 0;
-	// Test 4 310 200 100. One philosopher should die. but DOES NOT: 
-	args->numbr_p = 4;
-	args->t2die_p = 200;
-	args->t2eat_p = 300;
-	args->t2slp_p = 100;
-	args->times_p = 0;
-	// args->numbr_p = 4;
-	// args->t2die_p = 310;
-	// args->t2eat_p = 200;
-	// args->t2slp_p = 100;
-	// args->times_p = 0;
-	// next ones r ok:
-/* 	args->numbr_p = 5;
-	args->t2die_p = 800;
-	args->t2eat_p = 200;
-	args->t2slp_p = 200; 
-	args->times_p = 0; */
-	/* args->numbr_p = 5;
-	args->t2die_p = 800;
-	args->t2eat_p = 200;
-	args->t2slp_p = 200;
-	args->times_p = 7; */
-	/* args->numbr_p = 4;
-	args->t2die_p = 410;
-	args->t2eat_p = 200;
-	args->t2slp_p = 200;
-	args->times_p = 0; */
-	// args->times_p = 0;
+	args->numbr_p = ft_itoa(av[1]);
+	args->t2die_p = ft_itoa(av[2]);
+	args->t2eat_p = ft_itoa(av[3]);
+	args->t2slp_p = ft_itoa(av[4]);
+	args->times_p = ft_itoa(av[5]);
 	args->died = 0;
 	args->fork = calloc(args->numbr_p, sizeof(int));
 	if (!args->fork)
@@ -245,14 +231,35 @@ void	args_destroy(t_args *args)
 	free(args->fork);
 	free(args->fork_m);
 }
+// check if the arguments are numeric
+int av_check(char **av)
+{
+	int i;
+	int j;
 
-int	main(void)
+	i = 0;
+	while (av[++i])
+	{
+		j = -1;
+		while (av[i][++j])
+		{
+			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
+				return (0);
+		}
+	}
+	return (1);
+}
+
+int	main(int ac, char **av)
 {
 	t_args		args;
 	int			i;
 	t_philo		*philo;
+	(void)		av;
 
-	if (!args_init(&args))
+	if (!(ac == 5 || ac == 6) || !av_check(av))
+		return (printf("parameters: 5 or 6 positive numbers\n"), 2);
+	if (!args_init(&args, av))
 		return (1);
 	philo = calloc(args.numbr_p, sizeof(t_philo));
 	if (!philo)
@@ -272,7 +279,7 @@ int	main(void)
 	while (++i < args.numbr_p)
 	{
 		pthread_join(philo[i].thread_id, NULL);
-		printf("Thread of philosopher %d is joined\n", i);
+		// printf("Thread of philosopher %d is joined\n", i);
 	}
 	args_destroy (&args);
 	free (philo);
