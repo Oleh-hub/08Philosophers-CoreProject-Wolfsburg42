@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/15 20:47:53 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/16 12:24:47 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,6 @@ static void	ft_printf_out(t_philo *philo, char *str)
 // check if the philosopher is alive
 int is_alive(t_philo *philo)
 {
-	// int current_time;
-	
-	// current_time = get_time(philo->tm_lmeal); // get time since thelast meal
-	// if (philo->id == 0 || philo->id == 2)	//
-	// 	printf("%i: %i %i\n", philo->id, current_time, philo->args->t2die_p); //
-	// if (current_time > philo->args->t2die_p)
 	if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
 	{
 		pthread_mutex_lock(&(philo->args->died_status));
@@ -98,18 +92,18 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
+		// if (!is_alive(philo))
+		// 	break;
 		pthread_mutex_lock(&(philo->args->died_status)); // if sombody died
+		if (philo->id == 0)						// trace
+			ft_printf_out(philo, "tracing");	// trace	
 		if (philo->args->died)
-		{
-			pthread_mutex_unlock(&philo->args->died_status);
-			break ;
-		}
+			return (pthread_mutex_unlock(&philo->args->died_status), NULL) ;
 		else
 			pthread_mutex_unlock(&philo->args->died_status); // end if
-			
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
-		if (philo->id % 2 && i == 0) // uneven philos(1, 3... start with a delay
+		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
 			ft_msleep(3);
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		if (philo->id == philo->args->numbr_p - 1)
@@ -117,10 +111,7 @@ void	*phl_thrd(void	*arg)
 		else
 			pthread_mutex_lock(&philo->args->fork_m[philo->id + 1]);
 		if (!is_alive(philo))
-		{
-			fork_mutex_unlock(philo);
-			return (NULL);
-		}
+			return (fork_mutex_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
 		{
 			philo->args->fork[philo->id] = 1;
@@ -130,12 +121,27 @@ void	*phl_thrd(void	*arg)
 			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
 				return (NULL);
 			ft_printf_out(philo, "is eating");
-			ft_msleep(philo->args->t2eat_p);
+			// if the philo has to die during eating
+			if (philo->args->t2eat_p < philo->args->t2die_p)
+				ft_msleep(philo->args->t2eat_p);
+			else
+				ft_msleep(philo->args->t2die_p);
+			if (!is_alive(philo))
+				return (fork_mutex_unlock(philo), NULL);
+				
 			philo->args->fork[philo->id] = 0;
 			philo->args->fork[philo->id + 1] = 0;
 			fork_mutex_unlock(philo);
 			ft_printf_out(philo, "is sleeping");
-			ft_msleep(philo->args->t2slp_p);
+			// if the philo has to die during sleeping
+			if (philo->args->t2slp_p < (philo->args->t2die_p - philo->args->t2eat_p))
+				ft_msleep(philo->args->t2slp_p);
+			else
+				ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
+			if (!is_alive(philo))
+				return (fork_mutex_unlock(philo), NULL);
+			
+			ft_printf_out(philo, "is thinking");
 		}
 		else
 		{
@@ -163,10 +169,15 @@ t_args	*args_init(t_args *args)
 	// args->times_p = 0;
 	// Test 4 310 200 100. One philosopher should die. but DOES NOT: 
 	args->numbr_p = 4;
-	args->t2die_p = 310;
-	args->t2eat_p = 200;
+	args->t2die_p = 200;
+	args->t2eat_p = 300;
 	args->t2slp_p = 100;
 	args->times_p = 0;
+	// args->numbr_p = 4;
+	// args->t2die_p = 310;
+	// args->t2eat_p = 200;
+	// args->t2slp_p = 100;
+	// args->times_p = 0;
 	// next ones r ok:
 /* 	args->numbr_p = 5;
 	args->t2die_p = 800;
@@ -219,7 +230,6 @@ t_args	*args_init(t_args *args)
 		pthread_mutex_destroy(&args->died_status);
 		return (free(args->fork), free(args->fork_m), NULL);
 	}
-
 	return (args);
 }
 
