@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/16 21:23:58 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/17 14:41:38 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static void	ft_printf_out(t_philo *philo, char *str)
 // check if the philosopher is alive
 int is_alive(t_philo *philo)
 {
-	if (get_time(philo->tm_lmeal) > philo->args->t2die_p)
+	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
 	{
 		pthread_mutex_lock(&(philo->args->died_status));
 		philo->args->died = 1;
@@ -96,29 +96,35 @@ int issomeone_dead(t_args *args)
 
 // philosophers life cycle
 // function, that is executed by the thread of the philosopher
-// the last philosopher takes the first fork and then the fork of philosopher [0]
+// the last philosopher takes the first fork and then the fork of philosopher[0]
+//
+// long	last_breath; - case when philo lives b4 the milstone event (eat, sleep)
+
 void	*phl_thrd(void	*arg)
 {
 	t_philo	*philo;
 	int		i;
+	long	last_breath; // case when philo lives b4 the milstone event (eat, sleep)
 	
 	philo = (t_philo *)arg;
 	i = -1;
 	while (1)
 	{
-		if (philo->id  ==  0 && get_time(philo->args->time) > 300) // debug
-				ft_printf_out(philo, "DEBUUG should die soon"); // debug
+		{ // is the philo should die b4 starting to eat
+		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+		if (i >=  0 && last_breath < philo->args->t2eat_p)
+			ft_msleep(last_breath);
 		if (!is_alive(philo)) // is this philo still alive?
 			return (NULL);
 		if (issomeone_dead(philo->args)) // check if someone is dead
 			return (NULL);
+		}
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
 			ft_msleep(3);
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
-		
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		if (philo->id == philo->args->numbr_p - 1)
 			pthread_mutex_lock(&philo->args->fork_m[0]);
@@ -159,8 +165,6 @@ void	*phl_thrd(void	*arg)
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
 			ft_printf_out(philo, "is thinking");
-			if (philo->id  ==  0)
-				ft_printf_out(philo, "DEBUUG AFTER thinking");
 		}
 		else
 		{
