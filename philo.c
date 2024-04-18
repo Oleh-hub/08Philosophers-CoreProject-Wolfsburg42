@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 17:56:24 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 18:07:59 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,20 +110,19 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
-		// here should be a condition to make a philo to die if lifspan is shorkter than tiem to eat
-		// AND he should dont die if eat + sleep < lifespan
-		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p)
-		{
-			{// is the philo should die b4 starting to eat
-			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-			if (i >=  0 && last_breath < philo->args->t2eat_p)
-				ft_msleep(last_breath);
+			// here should be a condition to make a philo to die if lifspan is shorkter than tiem to eat
+			// AND he should dont die if eat + sleep < lifespan
+			if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p)
+			{
+				// calculates what is left_to_live if life_span < tie_to_eat
+				last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+				if (i >=  0 && last_breath < philo->args->t2eat_p)
+					ft_msleep(last_breath);
+				if (!is_alive(philo))
+					return (NULL);
+				if (issomeone_dead(philo->args)) // check if someone is dead
+					return (NULL);
 			}
-			if (!is_alive(philo)) // is this philo still alive? NOT SURE if it should be here or in the loop above
-				return (NULL);
-			if (issomeone_dead(philo->args)) // check if someone is dead
-				return (NULL);
-		}
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
@@ -170,7 +169,7 @@ void	*phl_thrd(void	*arg)
 
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
-			ft_printf_out(philo, "is thinking");
+			// ft_printf_out(philo, "is thinking");
 		}
 		else
 		{
@@ -179,8 +178,9 @@ void	*phl_thrd(void	*arg)
 				pthread_mutex_unlock(&philo->args->fork_m[0]);
 			else
 				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
-			ft_printf_out(philo, "is thinking");
+			// ft_printf_out(philo, "is thinking");
 		}
+		ft_printf_out(philo, "is thinking");
 	}
 	return (NULL);
 }
