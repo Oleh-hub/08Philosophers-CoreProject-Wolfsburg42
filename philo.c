@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 16:29:53 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 17:56:24 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ long	get_time(struct timeval time)
 // mutexed print out the philosopher's actions
 static void	ft_printf_out(t_philo *philo, char *str)
 {
-	pthread_mutex_lock(&(philo->args->print_mid));
+	pthread_mutex_lock(&(philo->args->print_mtx));
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id, str);
-	pthread_mutex_unlock(&philo->args->print_mid);
+	pthread_mutex_unlock(&philo->args->print_mtx);
 }
 
 // check if the philosopher is alive
@@ -110,23 +110,19 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
-		{ // is the philo should die b4 starting to eat
-		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-		if (i >=  0 && last_breath < philo->args->t2eat_p)
-			ft_msleep(last_breath);
-		if (!is_alive(philo)) // is this philo still alive?
-			return (NULL);
-		// definitely dies above
-		// {if (philo->id == 0 && i >=0)
-		// 	{
-		// 		pthread_mutex_lock(&(philo->args->print_mid));
-		// 		printf("philo %i is still alive \n", philo->id);
-		// 		pthread_mutex_unlock(&philo->args->print_mid);
-		// 	}
-		// }
-			
-		if (issomeone_dead(philo->args)) // check if someone is dead
-			return (NULL);
+		// here should be a condition to make a philo to die if lifspan is shorkter than tiem to eat
+		// AND he should dont die if eat + sleep < lifespan
+		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p)
+		{
+			{// is the philo should die b4 starting to eat
+			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+			if (i >=  0 && last_breath < philo->args->t2eat_p)
+				ft_msleep(last_breath);
+			}
+			if (!is_alive(philo)) // is this philo still alive? NOT SURE if it should be here or in the loop above
+				return (NULL);
+			if (issomeone_dead(philo->args)) // check if someone is dead
+				return (NULL);
 		}
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
@@ -221,11 +217,11 @@ t_args	*args_init(t_args *args, char **av)
 	args->fork_m = calloc(args->numbr_p, sizeof(pthread_mutex_t));
 	if (!args->fork_m)
 		return (free(args->fork), NULL);
-	if (pthread_mutex_init(&args->print_mid, NULL))
+	if (pthread_mutex_init(&args->print_mtx, NULL))
 		return (free(args->fork), free(args->fork_m), NULL);
 	if (pthread_mutex_init(&args->died_status, NULL))
 	{
-		pthread_mutex_destroy(&args->print_mid);
+		pthread_mutex_destroy(&args->print_mtx);
 		return (free(args->fork), free(args->fork_m), NULL);
 	}
 	i = -1;
@@ -235,7 +231,7 @@ t_args	*args_init(t_args *args, char **av)
 		{
 			while (--i >= 0)
 				pthread_mutex_destroy(&args->fork_m[i]);
-			pthread_mutex_destroy(&args->print_mid);
+			pthread_mutex_destroy(&args->print_mtx);
 			pthread_mutex_destroy(&args->died_status);
 			return (free(args->fork), free(args->fork_m), NULL);
 		}
@@ -245,7 +241,7 @@ t_args	*args_init(t_args *args, char **av)
 	{
 		while (++i < args->numbr_p)
 			pthread_mutex_destroy(&args->fork_m[i]);
-		pthread_mutex_destroy(&args->print_mid);
+		pthread_mutex_destroy(&args->print_mtx);
 		pthread_mutex_destroy(&args->died_status);
 		return (free(args->fork), free(args->fork_m), NULL);
 	}
@@ -259,7 +255,7 @@ void	args_destroy(t_args *args)
 	i = -1;
 	while (++i < args->numbr_p)
 		pthread_mutex_destroy(&args->fork_m[i]);
-	pthread_mutex_destroy(&args->print_mid);
+	pthread_mutex_destroy(&args->print_mtx);
 	pthread_mutex_destroy(&args->died_status);
 	free(args->fork);
 	free(args->fork_m);
