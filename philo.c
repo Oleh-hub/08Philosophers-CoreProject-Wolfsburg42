@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 19:06:21 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 19:39:48 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,6 +291,13 @@ int	main(int ac, char **av)
 		return (printf("parameters: 4 or 5 positive numbers\n"), 2);
 	if (!args_init(&args, av))
 		return (1);
+	if (args.numbr_p == 1)
+	{
+		printf("0 0 has taken the left fork\n");
+		ft_msleep(args.t2die_p);
+		printf("%i 0 has died\n", args.t2die_p);
+		return (args_destroy(&args), 0);
+	}
 	philo = calloc(args.numbr_p, sizeof(t_philo));
 	if (!philo)
 		return (args_destroy(&args), 3);
