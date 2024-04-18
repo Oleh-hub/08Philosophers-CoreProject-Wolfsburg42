@@ -13,14 +13,16 @@ OBJS_DIR:=	obj/
 OBJS_PR	:=	$(addprefix $(OBJS_DIR), $(OBJS))
 # CFLAGS	:=	-Wall -Wextra -Werror -g
 # CFLAGS	:=	-Wall -Wextra -Werror -g -pthread
-CFLAGS	:=	-Wall -Wextra -Werror -g -fsanitize=thread
+CFLAGS	:=	-Wall -Wextra -Werror -g  -fsanitize=thread  ###
+# CFLAGS	:=	-Wall -Wextra -Werror -g  -fsanitize=address
+# lldb ./philo 4 410 200 200 200  # debugging from terminal
 
 all : $(NAME)
 
 $(NAME) : $(OBJS_PR) 
 # $(CC) $(OBJS_PR) -O3  -o $(NAME)
 # $(CC) $(OBJS_PR) -O3  -pthread -o $(NAME)
-	$(CC) $(OBJS_PR) -O3 -fsanitize=thread -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS_PR) -O3 -o $(NAME)
 
 $(OBJS_DIR)%.o : %.c philo.h
 	mkdir -p $(OBJS_DIR)

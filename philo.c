@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 19:50:10 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 21:10:21 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,11 @@ static void	ft_printf_out(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->args->print_mtx));
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
+	// if (!strcmp(str, "has died")) /////////////////////////////////////////////
+	// {
+	// 	pthread_mutex_unlock(&philo->args->print_mtx);
+	// 	return ;
+	// }
 	pthread_mutex_unlock(&philo->args->print_mtx);
 }
 
@@ -100,13 +105,11 @@ int issomeone_dead(t_args *args)
 //
 // long	last_breath; - case when philo lives b4 the milstone event (eat, sleep)
 
-void	*phl_thrd(void	*arg)
+void	*phl_thrd(t_philo *philo)
 {
-	t_philo	*philo;
 	int		i;
 	long	last_breath; // case when philo lives b4 the milstone event (eat, sleep)
 	
-	philo = (t_philo *)arg;
 	i = -1;
 	while (1)
 	{
@@ -134,17 +137,18 @@ void	*phl_thrd(void	*arg)
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-		if (philo->id == philo->args->numbr_p - 1)
-			pthread_mutex_lock(&philo->args->fork_m[0]);
-		else
-			pthread_mutex_lock(&philo->args->fork_m[philo->id + 1]);
+		// if (philo->id == philo->args->numbr_p - 1) /// genius limitation of the last philo case
+		// 	pthread_mutex_lock(&philo->args->fork_m[0]); /// genius limitation of the last philo case
+		// else
+			pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]); /// genius limitation of the last philo case
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
-		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
+		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p])) /// genius limitation of the last philo case
 		{
 			philo->args->fork[philo->id] = 1;
 			ft_printf_out(philo, "has taken the left fork");
-			philo->args->fork[philo->id + 1] = 1;
+			// philo->args->fork[philo->id + 1] = 1;  ///
+			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
 			ft_printf_out( philo, "has taken the right fork");
 			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
 				return (NULL);
@@ -158,7 +162,8 @@ void	*phl_thrd(void	*arg)
 				return (forks_mutex_unlock(philo), NULL);
 				
 			philo->args->fork[philo->id] = 0;
-			philo->args->fork[philo->id + 1] = 0;
+			// philo->args->fork[philo->id + 1] = 0;  /////
+			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;  /////
 			forks_mutex_unlock(philo);
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
@@ -179,7 +184,8 @@ void	*phl_thrd(void	*arg)
 			if (philo->id == philo->args->numbr_p - 1)
 				pthread_mutex_unlock(&philo->args->fork_m[0]);
 			else
-				pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+				pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]); ///
+				// pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
 		}
 		ft_printf_out(philo, "is thinking");
 	}
@@ -280,6 +286,8 @@ int av_check(char **av)
 	return (1);
 }
 
+typedef void *(*t_threadfun)(void *);
+
 int	main(int ac, char **av)
 {
 	t_args		args;
@@ -308,7 +316,7 @@ int	main(int ac, char **av)
 		philo[i].id = i;
 		philo[i].args = &args;
 		philo[i].tm_lmeal = args.time;
-		if (pthread_create(&philo[i].thread_id, NULL, phl_thrd,
+		if (pthread_create(&philo[i].thread_id, NULL, (t_threadfun) phl_thrd,
 				(void *) &philo[i]))
 			return (args_destroy(&args), free(philo), 4);
 	}
