@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 18:16:15 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 18:38:54 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,21 +110,21 @@ void	*phl_thrd(void	*arg)
 	i = -1;
 	while (1)
 	{
-			// here should be a condition to make a philo to die if lifspan is shorkter than tiem to eat
-			// AND he should dont die if eat + sleep < lifespan
-			// if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p)
-			if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
-				philo->args->t2die_p < 2* philo->args->t2eat_p)
-			{
-				// calculates what is left_to_live if life_span < tie_to_eat
-				last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-				if (i >=  0 && last_breath < philo->args->t2eat_p)
-					ft_msleep(last_breath);
-				if (!is_alive(philo))
-					return (NULL);
-				if (issomeone_dead(philo->args)) // check if someone is dead
-					return (NULL);
-			}
+		// here should be a condition to make a philo to die if lifspan is shorkter than tiem to eat
+		// AND he should dont die if eat + sleep < lifespan
+		// if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p)
+		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
+			philo->args->t2die_p < 2* philo->args->t2eat_p)
+		{
+			// calculates what is left_to_live if life_span < tie_to_eat
+			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+			if (i >=  0 && last_breath < philo->args->t2eat_p)
+				ft_msleep(last_breath);
+		}
+		if (!is_alive(philo))
+			return (NULL);
+		if (issomeone_dead(philo->args)) // check if someone is dead
+			return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
