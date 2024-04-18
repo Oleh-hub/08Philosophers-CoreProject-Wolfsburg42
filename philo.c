@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/17 14:41:38 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 16:29:53 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ int is_alive(t_philo *philo)
 }
 
 // unlocking philos forks considering the last philosopher
-void fork_mutex_unlock(t_philo *philo)
+void forks_mutex_unlock(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
 	if (philo->id == philo->args->numbr_p - 1)
@@ -116,6 +116,15 @@ void	*phl_thrd(void	*arg)
 			ft_msleep(last_breath);
 		if (!is_alive(philo)) // is this philo still alive?
 			return (NULL);
+		// definitely dies above
+		// {if (philo->id == 0 && i >=0)
+		// 	{
+		// 		pthread_mutex_lock(&(philo->args->print_mid));
+		// 		printf("philo %i is still alive \n", philo->id);
+		// 		pthread_mutex_unlock(&philo->args->print_mid);
+		// 	}
+		// }
+			
 		if (issomeone_dead(philo->args)) // check if someone is dead
 			return (NULL);
 		}
@@ -131,7 +140,7 @@ void	*phl_thrd(void	*arg)
 		else
 			pthread_mutex_lock(&philo->args->fork_m[philo->id + 1]);
 		if (!is_alive(philo))
-			return (fork_mutex_unlock(philo), NULL);
+			return (forks_mutex_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)]))
 		{
 			philo->args->fork[philo->id] = 1;
@@ -147,11 +156,11 @@ void	*phl_thrd(void	*arg)
 			else
 				ft_msleep(philo->args->t2die_p);
 			if (!is_alive(philo))
-				return (fork_mutex_unlock(philo), NULL);
+				return (forks_mutex_unlock(philo), NULL);
 				
 			philo->args->fork[philo->id] = 0;
 			philo->args->fork[philo->id + 1] = 0;
-			fork_mutex_unlock(philo);
+			forks_mutex_unlock(philo);
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
 			ft_printf_out(philo, "is sleeping");
@@ -162,6 +171,7 @@ void	*phl_thrd(void	*arg)
 				ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
 			if (!is_alive(philo)) // is this philo still alive?
 				return (NULL);
+
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
 			ft_printf_out(philo, "is thinking");
