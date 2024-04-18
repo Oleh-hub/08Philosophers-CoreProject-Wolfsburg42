@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 19:45:22 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/18 19:50:10 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,9 +123,9 @@ void	*phl_thrd(void	*arg)
 				(philo->args->numbr_p % 2 && philo->id == philo->args->numbr_p - 2)) //uneven philos the one b4 last dies b4 getting a fork on a first try
 				ft_msleep(last_breath);
 		}
-		if (!is_alive(philo))
-			return (NULL);
 		if (issomeone_dead(philo->args)) // check if someone is dead
+			return (NULL);
+		if (!is_alive(philo))
 			return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
@@ -168,9 +168,9 @@ void	*phl_thrd(void	*arg)
 				ft_msleep(philo->args->t2slp_p);
 			else
 				ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
-			if (!is_alive(philo)) // is this philo still alive?
-				return (NULL);
 			if (issomeone_dead(philo->args)) // check if someone is dead
+				return (NULL);
+			if (!is_alive(philo)) // is this philo still alive?
 				return (NULL);
 		}
 		else
