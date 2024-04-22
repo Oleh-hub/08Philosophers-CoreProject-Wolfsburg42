@@ -6,11 +6,29 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 21:10:21 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/22 09:10:18 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+// does the same as calloc 
+void	*ft_calloc(size_t num, size_t size)
+{
+	unsigned char	*ptr;
+	size_t			nsize;
+	size_t			i;
+
+	nsize = num * size;
+	ptr = malloc(nsize);
+	if (!ptr)
+	{
+		i = -1;
+		while (++i < nsize)
+			ptr[i] = 0;
+	}
+	return (ptr);
+}
 
 // returns time, passed sincse 1.01.1970 in ms
 static long int	time_ms(void)
@@ -53,11 +71,6 @@ static void	ft_printf_out(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->args->print_mtx));
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
-	// if (!strcmp(str, "has died")) /////////////////////////////////////////////
-	// {
-	// 	pthread_mutex_unlock(&philo->args->print_mtx);
-	// 	return ;
-	// }
 	pthread_mutex_unlock(&philo->args->print_mtx);
 }
 
@@ -86,7 +99,6 @@ void forks_mutex_unlock(t_philo *philo)
 }
 
 //check if someone is dead
-
 int issomeone_dead(t_args *args)
 {
 	pthread_mutex_lock(&(args->died_status));
@@ -113,10 +125,8 @@ void	*phl_thrd(t_philo *philo)
 	i = -1;
 	while (1)
 	{
-		
 		// here should be a condition to make a philo to die if lifspan < time2eat
 		// AND he should dont die if eat + sleep < lifespan
-			
 		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
 			philo->args->t2die_p < 2* philo->args->t2eat_p)
 		{
@@ -137,17 +147,13 @@ void	*phl_thrd(t_philo *philo)
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-		// if (philo->id == philo->args->numbr_p - 1) /// genius limitation of the last philo case
-		// 	pthread_mutex_lock(&philo->args->fork_m[0]); /// genius limitation of the last philo case
-		// else
-			pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]); /// genius limitation of the last philo case
+		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
-		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p])) /// genius limitation of the last philo case
+		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
 		{
 			philo->args->fork[philo->id] = 1;
 			ft_printf_out(philo, "has taken the left fork");
-			// philo->args->fork[philo->id + 1] = 1;  ///
 			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
 			ft_printf_out( philo, "has taken the right fork");
 			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
@@ -162,8 +168,7 @@ void	*phl_thrd(t_philo *philo)
 				return (forks_mutex_unlock(philo), NULL);
 				
 			philo->args->fork[philo->id] = 0;
-			// philo->args->fork[philo->id + 1] = 0;  /////
-			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;  /////
+			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;
 			forks_mutex_unlock(philo);
 			if (issomeone_dead(philo->args)) // check if someone is dead
 				return (NULL);
@@ -184,8 +189,7 @@ void	*phl_thrd(t_philo *philo)
 			if (philo->id == philo->args->numbr_p - 1)
 				pthread_mutex_unlock(&philo->args->fork_m[0]);
 			else
-				pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]); ///
-				// pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+				pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 		}
 		ft_printf_out(philo, "is thinking");
 	}
@@ -286,7 +290,7 @@ int av_check(char **av)
 	return (1);
 }
 
-typedef void *(*t_threadfun)(void *);
+typedef void *(*t_threadfun)(void *);   ////////////
 
 int	main(int ac, char **av)
 {
@@ -306,7 +310,7 @@ int	main(int ac, char **av)
 		printf("%i 1 has died\n", args.t2die_p);
 		return (args_destroy(&args), 0);
 	}
-	philo = calloc(args.numbr_p, sizeof(t_philo));
+	philo = ft_calloc(args.numbr_p, sizeof(t_philo));
 	if (!philo)
 		return (args_destroy(&args), 3);
 	philo->args = &args;
