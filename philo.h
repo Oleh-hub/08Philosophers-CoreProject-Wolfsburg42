@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/18 21:12:24 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/22 18:51:37 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef struct s_args
 	int				t2die_p; // time_to_die_in_ms
 	int				t2eat_p; // time_to_eat_in_ms
 	int				t2slp_p; // time_to_sleep_in_ms
-	int				times_p; //number_of_times_each_philosopher_must_eat
+	int				times_p; // number_of_times_each_philosopher_must_eat
 	int				*fork;	// the array of forks may == 0 or 1 only. Needed 
 	int				died;		// flag of the death of a philosopher
 	// because U "should protect the forks state with a mutex for each of them."

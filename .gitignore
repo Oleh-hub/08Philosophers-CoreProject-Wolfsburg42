@@ -5,3 +5,5 @@ test
 philo
 *.o
 GetTmOfDay
+*.txt
+.DS_Store

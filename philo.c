@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/22 14:24:00 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/22 20:12:10 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ long	get_time(struct timeval time)
 static void	ft_printf_out(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->args->print_mtx));
+	// if (issomeone_dead)
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
 	pthread_mutex_unlock(&philo->args->print_mtx);
 }
@@ -154,7 +155,7 @@ void	*phl_thrd(t_philo *philo)
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 		if (issomeone_dead(philo->args)) // check if someone is dead
-			return (NULL);
+			return (forks_mutex_unlock(philo), NULL); /// alex
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
