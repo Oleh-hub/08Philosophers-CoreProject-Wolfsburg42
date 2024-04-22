@@ -13,8 +13,9 @@ OBJS_DIR:=	obj/
 OBJS_PR	:=	$(addprefix $(OBJS_DIR), $(OBJS))
 # CFLAGS	:=	-Wall -Wextra -Werror -g
 # CFLAGS	:=	-Wall -Wextra -Werror -g -pthread
-# CFLAGS	:=	-Wall -Wextra -Werror -g  -fsanitize=thread  ###
-CFLAGS	:=	-Wall -Wextra -Werror -g  -fsanitize=address
+CFLAGS	=	-Wall -Wextra -Werror -g
+# CLFAGS += -fsanitize=thread
+# CFLAGS	:=	-Wall -Wextra -Werror -g  -fsanitize=address
 # lldb ./philo 4 410 200 200 200  # debugging from terminal
 
 all : $(NAME)

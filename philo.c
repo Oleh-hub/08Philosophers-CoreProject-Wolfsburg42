@@ -6,9 +6,14 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/22 09:10:18 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/22 14:24:00 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// still die when:(((
+//  198 1010 500 500
+//  198 410 200 200
+//  198 460 200 200
 
 #include "philo.h"
 
@@ -92,10 +97,7 @@ int is_alive(t_philo *philo)
 void forks_mutex_unlock(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
-	if (philo->id == philo->args->numbr_p - 1)
-		pthread_mutex_unlock(&philo->args->fork_m[0]);
-	else
-		pthread_mutex_unlock(&philo->args->fork_m[philo->id + 1]);
+	pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 }
 
 //check if someone is dead
@@ -125,15 +127,18 @@ void	*phl_thrd(t_philo *philo)
 	i = -1;
 	while (1)
 	{
+		// now 2 fix the case when a task runs after a philo dies 3 1000 350 100
+		
 		// here should be a condition to make a philo to die if lifspan < time2eat
 		// AND he should dont die if eat + sleep < lifespan
 		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
-			philo->args->t2die_p < 2* philo->args->t2eat_p)
+			philo->args->t2die_p < 2 * philo->args->t2eat_p)
 		{
 			// calculates what is left_to_live if life_span < tie_to_eat
+			// uneven philos the one b4 last dies b4 getting a fork on a first try
 			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
 			if ((i >=  0 && last_breath < philo->args->t2eat_p) || 
-				(philo->args->numbr_p % 2 && philo->id == philo->args->numbr_p - 2)) //uneven philos the one b4 last dies b4 getting a fork on a first try
+				(philo->args->numbr_p % 2 && philo->id == philo->args->numbr_p - 2))
 				ft_msleep(last_breath);
 		}
 		if (issomeone_dead(philo->args)) // check if someone is dead
@@ -143,19 +148,21 @@ void	*phl_thrd(t_philo *philo)
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
-			ft_msleep(3);
+			ft_msleep(3); ////////////eeeee
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
+		if (issomeone_dead(philo->args)) // check if someone is dead
+			return (NULL);
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
 		{
 			philo->args->fork[philo->id] = 1;
-			ft_printf_out(philo, "has taken the left fork");
+			ft_printf_out(philo, "has taken a fork");
 			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
-			ft_printf_out( philo, "has taken the right fork");
+			ft_printf_out( philo, "has taken a fork");
 			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
 				return (NULL);
 			ft_printf_out(philo, "is eating");
@@ -222,10 +229,10 @@ t_args	*args_init(t_args *args, char **av)
 	args->t2slp_p = ft_itoa(av[4]);
 	args->times_p = ft_itoa(av[5]);
 	args->died = 0;
-	args->fork = calloc(args->numbr_p, sizeof(int));
+	args->fork = ft_calloc(args->numbr_p, sizeof(int));
 	if (!args->fork)
 		return (NULL);
-	args->fork_m = calloc(args->numbr_p, sizeof(pthread_mutex_t));
+	args->fork_m = ft_calloc(args->numbr_p, sizeof(pthread_mutex_t));
 	if (!args->fork_m)
 		return (free(args->fork), NULL);
 	if (pthread_mutex_init(&args->print_mtx, NULL))
