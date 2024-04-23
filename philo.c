@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/23 18:34:20 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/23 18:39:37 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,13 +160,6 @@ void	*phl_thrd(t_philo *philo)
 			return (forks_mutex_unlock(philo), NULL); /// alex
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
-				// { //tracing - ft_calloc issue found and solved because of this tracing
-				// pthread_mutex_lock(&(philo->args->print_mtx));
-				// // printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
-				// printf("%d: %d %d: %d\n", philo->id, philo->args->fork[philo->id], (philo->id + 1) % philo->args->numbr_p,
-				// 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p]);
-				// pthread_mutex_unlock(&philo->args->print_mtx);
-				// }
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
 		{
 			philo->args->fork[philo->id] = 1;
