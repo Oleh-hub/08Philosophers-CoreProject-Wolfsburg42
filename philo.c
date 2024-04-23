@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/22 20:12:10 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/23 18:34:20 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 //  198 1010 500 500
 //  198 410 200 200
 //  198 460 200 200
+// 5 490 200 100 - "600 3 has died"
 
 #include "philo.h"
 
@@ -26,7 +27,7 @@ void	*ft_calloc(size_t num, size_t size)
 
 	nsize = num * size;
 	ptr = malloc(nsize);
-	if (!ptr)
+	if (ptr)
 	{
 		i = -1;
 		while (++i < nsize)
@@ -128,7 +129,8 @@ void	*phl_thrd(t_philo *philo)
 	i = -1;
 	while (1)
 	{
-		// now 2 fix the case when a task runs after a philo dies 3 1000 350 100
+		// ./philo 3 1000 350 100 "1050 1 has died" - why does not die on 1000 ?!
+		// ./philo 5 490 200 100| grep " 3 " - "600 3 has died" - why not on 490?!
 		
 		// here should be a condition to make a philo to die if lifspan < time2eat
 		// AND he should dont die if eat + sleep < lifespan
@@ -158,6 +160,13 @@ void	*phl_thrd(t_philo *philo)
 			return (forks_mutex_unlock(philo), NULL); /// alex
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
+				// { //tracing - ft_calloc issue found and solved because of this tracing
+				// pthread_mutex_lock(&(philo->args->print_mtx));
+				// // printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
+				// printf("%d: %d %d: %d\n", philo->id, philo->args->fork[philo->id], (philo->id + 1) % philo->args->numbr_p,
+				// 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p]);
+				// pthread_mutex_unlock(&philo->args->print_mtx);
+				// }
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
 		{
 			philo->args->fork[philo->id] = 1;
@@ -194,9 +203,9 @@ void	*phl_thrd(t_philo *philo)
 		else
 		{
 			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
-			if (philo->id == philo->args->numbr_p - 1)
-				pthread_mutex_unlock(&philo->args->fork_m[0]);
-			else
+			// if (philo->id == philo->args->numbr_p - 1)
+			// 	pthread_mutex_unlock(&philo->args->fork_m[0]);
+			// else
 				pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 		}
 		ft_printf_out(philo, "is thinking");
