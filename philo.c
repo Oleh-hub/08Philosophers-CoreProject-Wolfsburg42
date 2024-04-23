@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/23 18:39:37 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/23 20:02:18 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ void	*phl_thrd(t_philo *philo)
 		
 		// here should be a condition to make a philo to die if lifspan < time2eat
 		// AND he should dont die if eat + sleep < lifespan
+		if ()
 		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
 			philo->args->t2die_p < 2 * philo->args->t2eat_p)
 		{
@@ -160,6 +161,7 @@ void	*phl_thrd(t_philo *philo)
 			return (forks_mutex_unlock(philo), NULL); /// alex
 		if (!is_alive(philo))
 			return (forks_mutex_unlock(philo), NULL);
+		// if (the forks are free), the philosopher takes them:
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1) % philo->args->numbr_p]))
 		{
 			philo->args->fork[philo->id] = 1;
@@ -196,10 +198,7 @@ void	*phl_thrd(t_philo *philo)
 		else
 		{
 			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
-			// if (philo->id == philo->args->numbr_p - 1)
-			// 	pthread_mutex_unlock(&philo->args->fork_m[0]);
-			// else
-				pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
+			pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 		}
 		ft_printf_out(philo, "is thinking");
 	}
