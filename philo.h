@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 20:36:15 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 21:07:36 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,15 @@ typedef struct s_philo
 	t_args			*args;		// pointer to the arguments structure
 }				t_philo;
 
+// philo_utils2.c
 void	*ft_calloc(size_t num, size_t size);
 int		ft_itoa(char *av);
 void	ft_msleep(long int time);
 long	get_time(struct timeval time);
+// philo_utils1.c
 void	args_destroy(t_args *args);
+void	forks_mutex_unlock(t_philo *philo);
+t_args	*args_init(t_args *args, char **av);
+void	args_destroy(t_args *args);
+int		av_check(char **av);
 #endif /* PHILO_H */
