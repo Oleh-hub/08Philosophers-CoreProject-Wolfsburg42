@@ -6,15 +6,11 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 13:19:20 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 14:25:29 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// still die when:(((
-//  198 1010 500 500
-//  198 410 200 200
-//  198 460 200 200
-// 5 490 200 100 - "600 3 has died"
+// ./philo 4 310 200 100  - "313 1 has died"  case is dubious
 
 #include "philo.h"
 
@@ -54,7 +50,8 @@ void	ft_msleep(long int time)
 	start = time_ms();
 	while (1)
 	{
-		usleep(10);
+		// usleep(10);
+		usleep(150);
 		if (time_ms() - start >= time)
 			break ;
 	}
@@ -129,9 +126,6 @@ void	*phl_thrd(t_philo *philo)
 	i = -1;
 	while (1)
 	{
-		// ./philo 3 1000 350 100 "1050 1 has died" - why does not die on 1000 ?!
-		// ./philo 5 490 200 100| grep " 3 " - "600 3 has died" - why not on 490?!
-		
 		// here should be a condition to make a philo to die if lifspan < time2eat
 		// AND he should dont die if eat + sleep < lifespan
 		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p ||
@@ -157,7 +151,10 @@ void	*phl_thrd(t_philo *philo)
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
+		{
+			ft_printf_out(philo, "is thinking");
 			ft_msleep(3); ////////////eeeee
+		}
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
