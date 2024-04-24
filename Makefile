@@ -14,7 +14,7 @@ OBJS_PR	:=	$(addprefix $(OBJS_DIR), $(OBJS))
 # CFLAGS	:=	-Wall -Wextra -Werror -g -pthread
 CFLAGS		=	-Wall -Wextra -Werror -g
 # CLFAGS += -fsanitize=thread
-CFLAGS +=	-fsanitize=address
+# CFLAGS +=	-fsanitize=address
 # - malloc 0-zing does not work with this the falg above - use calloc!
 # lldb ./philo 4 410 200 200 200  # debugging from terminal
 
@@ -39,4 +39,4 @@ re : fclean all
 
 norm :
 #	norminette $(SRCS) philo.h
-	norminette philo.c philo.h
+	norminette philo.c philo_utils.c philo_utils1.c philo_utils2.c philo.h

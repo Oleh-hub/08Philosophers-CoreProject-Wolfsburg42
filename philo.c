@@ -6,11 +6,21 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 14:25:29 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 15:53:12 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// ./philo 4 310 200 100  - "313 1 has died"  case is dubious
+// https://nafuka11.github.io/philosophers-visualizer/
+// recomended border cases to check
+// ./philo 1 1010 500 500
+// ./philo 4 190 200 100
+// ./philo 4 290 200 100
+// ./philo 4 310 200 100 //
+// ./philo 4 390 200 100 //
+// ./philo 5 490 200 100
+// ./philo 5 590 200 100
+// ./philo 200 1010 500 500 //
+// ./philo 200 410 200 200 //
 
 #include "philo.h"
 
@@ -50,7 +60,6 @@ void	ft_msleep(long int time)
 	start = time_ms();
 	while (1)
 	{
-		// usleep(10);
 		usleep(150);
 		if (time_ms() - start >= time)
 			break ;
@@ -73,13 +82,12 @@ long	get_time(struct timeval time)
 static void	ft_printf_out(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->args->print_mtx));
-	// if (issomeone_dead)
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
 	pthread_mutex_unlock(&philo->args->print_mtx);
 }
 
 // check if the philosopher is alive
-int is_alive(t_philo *philo)
+int	is_alive(t_philo *philo)
 {
 	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
 	{
@@ -93,14 +101,14 @@ int is_alive(t_philo *philo)
 }
 
 // unlocking philos forks considering the last philosopher
-void forks_mutex_unlock(t_philo *philo)
+void	forks_mutex_unlock(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
 	pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1) % philo->args->numbr_p]);
 }
 
-//check if someone is dead
-int issomeone_dead(t_args *args)
+//check if someone is alerady dead
+int	issomeone_dead(t_args *args)
 {
 	pthread_mutex_lock(&(args->died_status));
 	if (args->died)
@@ -153,7 +161,7 @@ void	*phl_thrd(t_philo *philo)
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
 		{
 			ft_printf_out(philo, "is thinking");
-			ft_msleep(3); ////////////eeeee
+			ft_msleep(3);
 		}
 		// next line this is where teh philosopher waits till the fork is frre
 		// and does not check if he is already dead
@@ -208,7 +216,7 @@ void	*phl_thrd(t_philo *philo)
 }
 
 // converts the string to an integer
-int ft_itoa(char *av)
+int	ft_itoa(char *av)
 {
 	int i;
 	int num;
@@ -283,7 +291,7 @@ void	args_destroy(t_args *args)
 	free(args->fork_m);
 }
 // check if the arguments are numeric
-int av_check(char **av)
+int	av_check(char **av)
 {
 	int i;
 	int j;
