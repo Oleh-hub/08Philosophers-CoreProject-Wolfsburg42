@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 15:53:12 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 17:03:41 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,13 @@
 // ./philo 4 390 200 100 //
 // ./philo 5 490 200 100
 // ./philo 5 590 200 100
-// ./philo 200 1010 500 500 //
-// ./philo 200 410 200 200 //
+// The following border cases fails by other students projects like in 115XXX
+// ms, but not im my case:
+// ./philo 200 1010 500 500 // no death evan after 355XXX ms...
+// The tests with following border parameters failed by every other successful 
+// student project I have seen in my case as well:
+// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms...
+// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms...
 
 #include "philo.h"
 
@@ -161,6 +166,7 @@ void	*phl_thrd(t_philo *philo)
 		if (philo->id % 2 && i == 0) // uneven philos 1, 3... start  1 time with a delay
 		{
 			ft_printf_out(philo, "is thinking");
+			// ft_msleep(3);
 			ft_msleep(3);
 		}
 		// next line this is where teh philosopher waits till the fork is frre
