@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 17:03:41 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 18:39:11 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,7 +315,7 @@ int	av_check(char **av)
 	return (1);
 }
 
-typedef void *(*t_threadfun)(void *);   ////////////
+typedef void *(*t_threadfun)(void *);   ////Thobias idia
 
 int	main(int ac, char **av)
 {
