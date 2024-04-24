@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 20:20:45 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 20:52:36 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,11 +180,29 @@ void	*phl_thrd(t_philo *philo)
 	return (NULL);
 }
 
+//fork mutexes initialization = number_of_philos
+static t_args	*forks_mutex_init(t_args *args)
+{
+	int	i;
+
+	i = -1;
+	while (++i < args->numbr_p)
+	{
+		if (pthread_mutex_init(&args->fork_m[i], NULL))
+		{
+			while (--i >= 0)
+				pthread_mutex_destroy(&args->fork_m[i]);
+			pthread_mutex_destroy(&args->print_mtx);
+			pthread_mutex_destroy(&args->died_status);
+			return (free(args->fork), free(args->fork_m), NULL);
+		}
+	}
+	return (args);
+}
+
 // init the arguments structure
 t_args	*args_init(t_args *args, char **av)
 {
-	int			i;
-
 	args->numbr_p = ft_itoa(av[1]);
 	args->t2die_p = ft_itoa(av[2]);
 	args->t2eat_p = ft_itoa(av[3]);
@@ -200,31 +218,12 @@ t_args	*args_init(t_args *args, char **av)
 	if (pthread_mutex_init(&args->print_mtx, NULL))
 		return (free(args->fork), free(args->fork_m), NULL);
 	if (pthread_mutex_init(&args->died_status, NULL))
-	{
-		pthread_mutex_destroy(&args->print_mtx);
-		return (free(args->fork), free(args->fork_m), NULL);
-	}
-	i = -1;
-	while (++i < args->numbr_p)
-	{
-		if (pthread_mutex_init(&args->fork_m[i], NULL))
-		{
-			while (--i >= 0)
-				pthread_mutex_destroy(&args->fork_m[i]);
-			pthread_mutex_destroy(&args->print_mtx);
-			pthread_mutex_destroy(&args->died_status);
-			return (free(args->fork), free(args->fork_m), NULL);
-		}
-	}
-	i = -1;
+		return (pthread_mutex_destroy(&args->print_mtx), free(args->fork),
+			free(args->fork_m), NULL);
+	if (!forks_mutex_init(args))
+		return (NULL);
 	if (gettimeofday(&args->time, NULL) == -1)
-	{
-		while (++i < args->numbr_p)
-			pthread_mutex_destroy(&args->fork_m[i]);
-		pthread_mutex_destroy(&args->print_mtx);
-		pthread_mutex_destroy(&args->died_status);
-		return (free(args->fork), free(args->fork_m), NULL);
-	}
+		return (args_destroy(args), NULL);
 	return (args);
 }
 

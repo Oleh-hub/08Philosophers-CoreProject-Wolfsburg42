@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 20:18:27 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/24 20:36:15 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,5 @@ void	*ft_calloc(size_t num, size_t size);
 int		ft_itoa(char *av);
 void	ft_msleep(long int time);
 long	get_time(struct timeval time);
+void	args_destroy(t_args *args);
 #endif /* PHILO_H */
