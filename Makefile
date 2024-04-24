@@ -5,8 +5,8 @@
 
 NAME	:=	philo
 CC		:=	cc
-SRCS	:=	philo.c
-			# \ philo_utils.c	
+SRCS	:=	philo.c \
+			 philo_utils2.c	
 
 OBJS	:=	$(SRCS:.c=.o)
 OBJS_DIR:=	obj/
