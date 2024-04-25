@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 21:39:43 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 22:27:06 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,11 @@ void	*survived_eat_sleep(t_philo *philo)
 	// if (issomeone_dead(philo->args))
 	// 	return (NULL);
 	ft_printf_out(philo, "is sleeping");
-	if (philo->args->t2slp_p < (philo->args->t2die_p
-			- philo->args->t2eat_p))
+	if (philo->args->t2slp_p < (philo->args->t2die_p - philo->args->t2eat_p))
 		ft_msleep(philo->args->t2slp_p);
 	else
 		ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
-	if (issomeone_dead(philo->args))
-		return (NULL);
-	if (!is_alive(philo))
+	if (issomeone_dead(philo->args)	|| !is_alive(philo))
 		return (NULL);
 	return ((void *)philo);
 }
@@ -117,19 +114,19 @@ void	*survived_eat_sleep(t_philo *philo)
 
 // recomended border cases to check
 // ./philo 1 1010 500 500
-// ./philo 4 190 200 100 // 2 of 20
-// ./philo 4 290 200 100 // 5 of 20
-// ./philo 4 310 200 100 // 2 of 20
-// ./philo 4 390 200 100 // 2 of 20
-// ./philo 5 490 200 100 // 1 of 20
-// ./philo 5 590 200 100 // 2 of 20
+// ./philo 4 190 200 100 // 2 of 20 1/1 of 20
+// ./philo 4 290 200 100 // 5 of 20 2/1 of 20
+// ./philo 4 310 200 100 // 2 of 20 3 of 20
+// ./philo 4 390 200 100 // 2 of 20 1 of 20
+// ./philo 5 490 200 100 // 1 of 20 2 of 20
+// ./philo 5 590 200 100 // 2 of 20 1 of 20
 // The following border cases fails by other students projects like in 115XXX
 // ms, but not im my case:
-// ./philo 200 1010 500 500 // no death evan after 355XXX ms...
+// ./philo 200 1010 500 500 // no after 355k ms... // 14k/326k death - 35k
 // The tests with following border parameters failed by every other successful 
 // student project I have seen in my case as well:
-// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms...
-// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms...
+// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms... /6k-28k
+// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms... /1k -3k
 
 void	*phl_thrd(t_philo *philo)
 {
@@ -158,14 +155,6 @@ void	*phl_thrd(t_philo *philo)
 			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!is_alive(philo))
 			return (philoforks_mutexs_unlock(philo), NULL);
-		
-		// if (philo->id == 3 || philo->id == 1) // tracing start
-		// {
-		// pthread_mutex_lock(&(philo->args->print_mtx));
-		// printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "TEST");
-		// pthread_mutex_unlock(&philo->args->print_mtx);
-		// }									// tracing end
-		
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
