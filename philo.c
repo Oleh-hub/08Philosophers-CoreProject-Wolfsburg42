@@ -6,19 +6,18 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 09:31:21 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 19:11:25 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // https://nafuka11.github.io/philosophers-visualizer/
 // recomended border cases to check
 // ./philo 1 1010 500 500
-// ./philo 4 190 200 100
-// ./philo 4 290 200 100
-// ./philo 4 310 200 100 //
+// ./philo 4 190 200 100 - - -
+// ./philo 4 290 200 100 -// ./philo 4 310 200 100 //
 // ./philo 4 390 200 100 //
-// ./philo 5 490 200 100
-// ./philo 5 590 200 100
+// ./philo 5 490 200 100 - -
+// ./philo 5 590 200 100 -
 // The following border cases fails by other students projects like in 115XXX
 // ms, but not im my case:
 // ./philo 200 1010 500 500 // no death evan after 355XXX ms...

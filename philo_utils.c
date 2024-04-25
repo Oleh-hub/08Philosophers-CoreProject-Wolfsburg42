@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 12:27:00 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 19:12:01 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,22 @@ void	*survived_eat_sleep(t_philo *philo)
 //  code where the the porgram (the philosopher) waits till the mutex(e.g. fork)
 // is freed and does not check if he is already dead. 
 // E.g.	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
+
+// recomended border cases to check
+// ./philo 1 1010 500 500
+// ./philo 4 190 200 100 - - -
+// ./philo 4 290 200 100 -// ./philo 4 310 200 100 //
+// ./philo 4 390 200 100 //
+// ./philo 5 490 200 100 - -
+// ./philo 5 590 200 100 -
+// The following border cases fails by other students projects like in 115XXX
+// ms, but not im my case:
+// ./philo 200 1010 500 500 // no death evan after 355XXX ms...
+// The tests with following border parameters failed by every other successful 
+// student project I have seen in my case as well:
+// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms...
+// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms...
+
 void	*phl_thrd(t_philo *philo)
 {
 	int		i;
