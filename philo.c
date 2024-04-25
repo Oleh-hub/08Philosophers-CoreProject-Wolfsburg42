@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 09:24:36 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 09:31:21 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,6 @@ void	onephilo_case(t_args *args)
 	args_destroy(args);
 }
 
-////Thobias' idea
-typedef void	*(*t_threadfun)(void *);
 // struct s_philo initiation + threads creation.
 // the function creates the threads for the philosophers
 int	philo_ini(t_philo *philo, t_args *args)

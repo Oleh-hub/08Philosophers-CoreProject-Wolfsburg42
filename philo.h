@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 09:02:07 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 09:36:33 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@ typedef struct s_args
 	int				t2eat_p; // time_to_eat_in_ms
 	int				t2slp_p; // time_to_sleep_in_ms
 	int				times_p; // number_of_times_each_philosopher_must_eat
-	int				*fork;	// the array of forks may == 0 or 1 only. Needed 
 	int				died;		// flag of the death of a philosopher
-	// because U "should protect the forks state with a mutex for each of them."
+	int				*fork;	// the array of forks may == 0 or 1 only. Needed 
+	// because of subject statement: U "should protect the forks state with a
+	// mutex for each of them."
 	pthread_mutex_t	died_status; // 2 allow change 'int died' without data race
 	pthread_mutex_t	*fork_m; // an array of mutexes (fork[numbr_p]) 4 every fork
 	pthread_mutex_t	print_mtx; // mutex id 2 garantee no data race during printf
@@ -44,6 +45,11 @@ typedef struct s_philo
 	pthread_t		thread_id;	// thread id of the philosopher
 	t_args			*args;		// pointer to the arguments structure
 }				t_philo;
+
+////Thobias' idea to avoid dataype casting in the thread function:
+// 'void	*phl_thrd(t_philo *philo)' instead of 'void	*phl_thrd(void *philo)'
+// called from philo_ini()
+typedef void	*(*t_threadfun)(void *);
 
 // philo_utils2.c
 void	*ft_calloc(size_t num, size_t size);
