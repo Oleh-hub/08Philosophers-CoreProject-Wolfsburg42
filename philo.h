@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 09:36:33 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 11:08:42 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	ft_msleep(long int time);
 long	get_time(struct timeval time);
 // philo_utils1.c
 void	args_destroy(t_args *args);
-void	forks_mutex_unlock(t_philo *philo);
+void	philoforks_mutexs_unlock(t_philo *philo);
 t_args	*args_init(t_args *args, char **av);
 void	args_destroy(t_args *args);
 int		av_check(char **av);

@@ -6,14 +6,14 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 21:08:56 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 11:08:42 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 //fork mutexes initialization = number_of_philos
-static t_args	*forks_mutex_init(t_args *args)
+static t_args	*allforks_mutexs_ini(t_args *args)
 {
 	int	i;
 
@@ -33,7 +33,7 @@ static t_args	*forks_mutex_init(t_args *args)
 }
 
 // unlocking philos forks considering the last philosopher
-void	forks_mutex_unlock(t_philo *philo)
+void	philoforks_mutexs_unlock(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
 	pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1)
@@ -60,7 +60,7 @@ t_args	*args_init(t_args *args, char **av)
 	if (pthread_mutex_init(&args->died_status, NULL))
 		return (pthread_mutex_destroy(&args->print_mtx), free(args->fork),
 			free(args->fork_m), NULL);
-	if (!forks_mutex_init(args))
+	if (!allforks_mutexs_ini(args))
 		return (NULL);
 	if (gettimeofday(&args->time, NULL) == -1)
 		return (args_destroy(args), NULL);

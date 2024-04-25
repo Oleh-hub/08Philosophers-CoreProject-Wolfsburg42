@@ -6,11 +6,84 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 09:31:44 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 12:27:00 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+// Makes delay b4 comming to fork mutexes if the philo should die:
+// 1 - during his eating/sleeping for every case
+// (time_to_die < time_to_eat + time_to_sleep or time_to_die < 2 * time_to_eat)
+// 2 - during other philos eating in case the number_of_philosophers is uneven
+// (numbr_p % 2 && time_to_die < 3 * time_to_eat)
+void	wait4death(t_philo *philo, int i)
+{
+	long	last_breath;
+
+	if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p
+		|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
+	{
+		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+		if ((i >= 0 && last_breath < philo->args->t2eat_p)
+			|| (philo->args->numbr_p % 2 && philo->id
+				== philo->args->numbr_p - 2))
+			ft_msleep(last_breath);
+	}
+	if (i >= 0 && philo->args->numbr_p % 2
+		&& philo->args->t2die_p < 3 * philo->args->t2eat_p)
+	{
+		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
+		ft_msleep(last_breath);
+	}
+}
+
+// philo takes forks, eats and and than waits - created bcause of norminette
+// RETURNS:
+// (void *)philo or NULL if the gettimeofday fails
+void	*eating(t_philo *philo)
+{
+	philo->args->fork[philo->id] = 1;
+	ft_printf_out(philo, "has taken a fork");
+	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
+	ft_printf_out(philo, "has taken a fork");
+	if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
+		return (NULL);
+	ft_printf_out(philo, "is eating");
+	if (philo->args->t2eat_p < philo->args->t2die_p)
+		ft_msleep(philo->args->t2eat_p);
+	else
+		ft_msleep(philo->args->t2die_p);
+	return ((void *)philo);
+}
+
+// philo's life with taken forks :) - created becasue of norminette
+// RETURNS:
+// if the philo dies during eating/sleeping NULL is returned
+// otherwise tphilo
+void	*survived_eat_sleep(t_philo *philo)
+{
+	if (!eating(philo))
+		return (NULL);
+	if (!is_alive(philo))
+		return (philoforks_mutexs_unlock(philo), NULL);
+	philo->args->fork[philo->id] = 0;
+	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;
+	philoforks_mutexs_unlock(philo);
+	if (issomeone_dead(philo->args))
+		return (NULL);
+	ft_printf_out(philo, "is sleeping");
+	if (philo->args->t2slp_p < (philo->args->t2die_p
+			- philo->args->t2eat_p))
+		ft_msleep(philo->args->t2slp_p);
+	else
+		ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
+	if (issomeone_dead(philo->args))
+		return (NULL);
+	if (!is_alive(philo))
+		return (NULL);
+	return ((void *)philo);
+}
 
 // philosophers life cycle theread simulation
 // function, that is executed by the thread of the philosopher
@@ -34,32 +107,14 @@
 //  code where the the porgram (the philosopher) waits till the mutex(e.g. fork)
 // is freed and does not check if he is already dead. 
 // E.g.	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-
-// if the philo dies during the eating or sleeping time
-
 void	*phl_thrd(t_philo *philo)
 {
 	int		i;
-	long	last_breath;
 
 	i = -1;
 	while (1)
 	{
-		if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p
-			|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
-		{
-			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-			if ((i >= 0 && last_breath < philo->args->t2eat_p)
-				|| (philo->args->numbr_p % 2 && philo->id
-					== philo->args->numbr_p - 2))
-				ft_msleep(last_breath);
-		}
-		if (i >= 0 && philo->args->numbr_p % 2
-			&& philo->args->t2die_p < 3 * philo->args->t2eat_p)
-		{
-			last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-			ft_msleep(last_breath);
-		}
+		wait4death(philo, i);
 		if (issomeone_dead(philo->args))
 			return (NULL);
 		if (!is_alive(philo))
@@ -75,49 +130,17 @@ void	*phl_thrd(t_philo *philo)
 		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
 			% philo->args->numbr_p]);
 		if (issomeone_dead(philo->args))
-			return (forks_mutex_unlock(philo), NULL);
+			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!is_alive(philo))
-			return (forks_mutex_unlock(philo), NULL);
+			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
-			philo->args->fork[philo->id] = 1;
-			ft_printf_out(philo, "has taken a fork");
-			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
-			ft_printf_out(philo, "has taken a fork");
-			if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
-				return (NULL);
-			ft_printf_out(philo, "is eating");
-			// check if the philo has to die during eating
-			if (philo->args->t2eat_p < philo->args->t2die_p)
-				ft_msleep(philo->args->t2eat_p);
-			else
-				ft_msleep(philo->args->t2die_p);
-			if (!is_alive(philo))
-				return (forks_mutex_unlock(philo), NULL);
-			philo->args->fork[philo->id] = 0;
-			philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;
-			forks_mutex_unlock(philo);
-			if (issomeone_dead(philo->args))
-				return (NULL);
-			ft_printf_out(philo, "is sleeping");
-			// check if the philo has to die during sleeping
-			if (philo->args->t2slp_p < (philo->args->t2die_p
-					- philo->args->t2eat_p))
-				ft_msleep(philo->args->t2slp_p);
-			else
-				ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
-			if (issomeone_dead(philo->args))
-				return (NULL);
-			if (!is_alive(philo))
+			if (!survived_eat_sleep(philo))
 				return (NULL);
 		}
 		else
-		{
-			pthread_mutex_unlock(&philo->args->fork_m[philo->id]);
-			pthread_mutex_unlock(&philo->args->fork_m[(philo->id + 1)
-				% philo->args->numbr_p]);
-		}
+			philoforks_mutexs_unlock(philo);
 		ft_printf_out(philo, "is thinking");
 	}
 	return (NULL);
