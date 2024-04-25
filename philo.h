@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/24 21:07:36 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 09:02:07 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,4 +56,10 @@ void	forks_mutex_unlock(t_philo *philo);
 t_args	*args_init(t_args *args, char **av);
 void	args_destroy(t_args *args);
 int		av_check(char **av);
+// philo_utils.c
+void	*phl_thrd(t_philo *philo);
+// philo.c
+void	ft_printf_out(t_philo *philo, char *str);
+int		issomeone_dead(t_args *args);
+int		is_alive(t_philo *philo);
 #endif /* PHILO_H */
