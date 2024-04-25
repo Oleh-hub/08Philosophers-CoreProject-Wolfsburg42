@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 22:27:06 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 22:40:40 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,7 @@ void	*phl_thrd(t_philo *philo)
 	{
 		wait4death(philo, i);
 
-		if (issomeone_dead(philo->args))
-			return (NULL);
-		if (!is_alive(philo))
+		if (issomeone_dead(philo->args) || !is_alive(philo))
 			return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
