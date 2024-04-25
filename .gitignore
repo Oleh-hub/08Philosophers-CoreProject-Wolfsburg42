@@ -7,3 +7,4 @@ philo
 GetTmOfDay
 *.txt
 .DS_Store
+philo_utils

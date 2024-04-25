@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 19:12:01 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/25 20:18:35 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,8 @@ void	*survived_eat_sleep(t_philo *philo)
 // recomended border cases to check
 // ./philo 1 1010 500 500
 // ./philo 4 190 200 100 - - -
-// ./philo 4 290 200 100 -// ./philo 4 310 200 100 //
+// ./philo 4 290 200 100 -
+// ./philo 4 310 200 100 //
 // ./philo 4 390 200 100 //
 // ./philo 5 490 200 100 - -
 // ./philo 5 590 200 100 -
@@ -131,6 +132,7 @@ void	*phl_thrd(t_philo *philo)
 	while (1)
 	{
 		wait4death(philo, i);
+
 		if (issomeone_dead(philo->args))
 			return (NULL);
 		if (!is_alive(philo))
@@ -149,6 +151,14 @@ void	*phl_thrd(t_philo *philo)
 			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!is_alive(philo))
 			return (philoforks_mutexs_unlock(philo), NULL);
+		
+		if (philo->id == 3 || philo->id == 1) // tracing start
+		{
+		pthread_mutex_lock(&(philo->args->print_mtx));
+		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "TEST");
+		pthread_mutex_unlock(&philo->args->print_mtx);
+		}									// tracing end
+		
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{

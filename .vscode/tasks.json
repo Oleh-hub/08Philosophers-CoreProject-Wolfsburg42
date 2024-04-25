@@ -8,7 +8,11 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 // "-pthread",
-                "${file}",
+                // "${file}",
+                "philo.c",
+                "philo_utils.c",
+                "philo_utils1.c",
+                "philo_utils2.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
