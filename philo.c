@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/26 18:11:55 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 20:29:15 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,27 +15,23 @@
 #include "philo.h"
 
 // check if the philosopher is alive
-// int	is_alive(t_philo *philo)
-// {
-// 	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
-// 	{
-// 		pthread_mutex_lock(&(philo->args->died_status));
-// 		philo->args->died = 1;
-// 		pthread_mutex_unlock(&philo->args->died_status);
-// 		ft_printf_out(philo, "died");
-// 		return (0);
-// 	}
-// 	return (1);
-// }
-int	is_alive(t_philo *philo)
+int	is_alive(t_philo *philo, int isprintmutexed)
 {
 	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
 	{
 		pthread_mutex_lock(&(philo->args->died_status));
 		philo->args->died = 1;
 		pthread_mutex_unlock(&philo->args->died_status);
-		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1,
-			"died");
+		if (isprintmutexed)
+			printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1,
+				"died");
+		else
+		{
+			pthread_mutex_lock(&(philo->args->print_mtx));
+			printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1,
+				"died");
+			pthread_mutex_unlock(&philo->args->print_mtx);
+		}
 		return (0);
 	}
 	return (1);
@@ -48,6 +44,7 @@ int	issomeone_dead(t_args *args)
 	if (args->died)
 	{
 		pthread_mutex_unlock(&args->died_status);
+		// ft_msleep(10);
 		return (1);
 	}
 	pthread_mutex_unlock(&args->died_status);
