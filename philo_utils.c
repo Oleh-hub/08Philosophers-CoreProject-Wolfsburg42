@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 22:40:40 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 16:13:04 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 // (time_to_die < time_to_eat + time_to_sleep or time_to_die < 2 * time_to_eat)
 // 2 - during other philos eating in case the number_of_philosophers is uneven
 // (numbr_p % 2 && time_to_die < 3 * time_to_eat)
-		// DEBIGGING:
-		// if (philo->id == 3 || philo->id == 1) // tracing start
-		// {
-		// pthread_mutex_lock(&(philo->args->print_mtx));
-		// printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "TEST");
-		// pthread_mutex_unlock(&philo->args->print_mtx);
-		// }									// tracing end
+	// DEBIGGING:
+	// if (philo->id == 3 || philo->id == 1) // tracing start
+	// {
+	// pthread_mutex_lock(&(philo->args->print_mtx));
+	// printf("%l d%d%s\n", get_time(philo->args->time), philo->id + 1, "TEST");
+	// pthread_mutex_unlock(&philo->args->print_mtx);
+	// }									// tracing end
 void	wait4death(t_philo *philo, int i)
 {
 	long	last_breath;
@@ -51,12 +51,16 @@ void	wait4death(t_philo *philo, int i)
 void	*eating(t_philo *philo)
 {
 	philo->args->fork[philo->id] = 1;
-	ft_printf_out(philo, "has taken a fork");
+	if (!ft_printf_out(philo, "has taken a fork"))
+		return (NULL);
 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
-	ft_printf_out(philo, "has taken a fork");
+	if (!ft_printf_out(philo, "has taken a fork"))
+		return (NULL);
 	if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
 		return (NULL);
 	ft_printf_out(philo, "is eating");
+	if (!ft_printf_out(philo, "is eating"))
+		return (NULL);
 	if (philo->args->t2eat_p < philo->args->t2die_p)
 		ft_msleep(philo->args->t2eat_p);
 	else
@@ -72,20 +76,21 @@ void	*survived_eat_sleep(t_philo *philo)
 {
 	if (!eating(philo))
 		return (NULL);
-	if (issomeone_dead(philo->args) || !is_alive(philo))
-		return (philoforks_mutexs_unlock(philo), NULL);
+	// if (issomeone_dead(philo->args) || !is_alive(philo))
+	// 		return (philoforks_mutexs_unlock(philo), NULL);
 	philo->args->fork[philo->id] = 0;
 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;
 	philoforks_mutexs_unlock(philo);
 	// if (issomeone_dead(philo->args))
 	// 	return (NULL);
-	ft_printf_out(philo, "is sleeping");
+	if (!ft_printf_out(philo, "is sleeping"))
+		return (NULL);
 	if (philo->args->t2slp_p < (philo->args->t2die_p - philo->args->t2eat_p))
 		ft_msleep(philo->args->t2slp_p);
 	else
 		ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
-	if (issomeone_dead(philo->args)	|| !is_alive(philo))
-		return (NULL);
+	// if (issomeone_dead(philo->args)	|| !is_alive(philo))
+	// 	return (NULL);
 	return ((void *)philo);
 }
 
@@ -112,22 +117,6 @@ void	*survived_eat_sleep(t_philo *philo)
 // is freed and does not check if he is already dead. 
 // E.g.	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 
-// recomended border cases to check
-// ./philo 1 1010 500 500
-// ./philo 4 190 200 100 // 2 of 20 1/1 of 20
-// ./philo 4 290 200 100 // 5 of 20 2/1 of 20
-// ./philo 4 310 200 100 // 2 of 20 3 of 20
-// ./philo 4 390 200 100 // 2 of 20 1 of 20
-// ./philo 5 490 200 100 // 1 of 20 2 of 20
-// ./philo 5 590 200 100 // 2 of 20 1 of 20
-// The following border cases fails by other students projects like in 115XXX
-// ms, but not im my case:
-// ./philo 200 1010 500 500 // no after 355k ms... // 14k/326k death - 35k
-// The tests with following border parameters failed by every other successful 
-// student project I have seen in my case as well:
-// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms... /6k-28k
-// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms... /1k -3k
-
 void	*phl_thrd(t_philo *philo)
 {
 	int		i;
@@ -136,9 +125,10 @@ void	*phl_thrd(t_philo *philo)
 	while (1)
 	{
 		wait4death(philo, i);
-
 		if (issomeone_dead(philo->args) || !is_alive(philo))
 			return (NULL);
+		// if (issomeone_dead(philo->args))
+		// 	return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0)
@@ -161,7 +151,9 @@ void	*phl_thrd(t_philo *philo)
 		}
 		else
 			philoforks_mutexs_unlock(philo);
-		ft_printf_out(philo, "is thinking");
+		// ft_printf_out(philo, "is thinking");
+		if (!ft_printf_out(philo, "is thinking"))
+			return (NULL);
 	}
 	return (NULL);
 }

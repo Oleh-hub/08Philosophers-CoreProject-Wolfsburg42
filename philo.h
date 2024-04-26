@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 11:08:42 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 09:20:51 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_philo
 }				t_philo;
 
 ////Thobias' idea to avoid dataype casting in the thread function:
+////Thobias' idea to avoid dataype casting in the thread function:
 // 'void	*phl_thrd(t_philo *philo)' instead of 'void	*phl_thrd(void *philo)'
 // called from philo_ini()
 typedef void	*(*t_threadfun)(void *);
@@ -65,7 +66,8 @@ int		av_check(char **av);
 // philo_utils.c
 void	*phl_thrd(t_philo *philo);
 // philo.c
-void	ft_printf_out(t_philo *philo, char *str);
+// void	ft_printf_out(t_philo *philo, char *str);
+void	*ft_printf_out(t_philo *philo, char *str);
 int		issomeone_dead(t_args *args);
 int		is_alive(t_philo *philo);
 #endif /* PHILO_H */

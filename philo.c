@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/25 20:07:37 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 15:52:33 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,36 @@
 #include "philo.h"
 
 // mutexed print out the philosopher's actions
-void	ft_printf_out(t_philo *philo, char *str)
+// void	ft_printf_out(t_philo *philo, char *str)
+// {
+// 	pthread_mutex_lock(&(philo->args->print_mtx));
+// 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
+// 	pthread_mutex_unlock(&philo->args->print_mtx);
+// }
+
+void	*ft_printf_out(t_philo *philo, char *str)
 {
 	pthread_mutex_lock(&(philo->args->print_mtx));
+	if (issomeone_dead(philo->args) || !is_alive(philo))
+		return (pthread_mutex_unlock(&philo->args->print_mtx), NULL);
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
 	pthread_mutex_unlock(&philo->args->print_mtx);
+	return (philo);
 }
 
 // check if the philosopher is alive
+// int	is_alive(t_philo *philo)
+// {
+// 	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
+// 	{
+// 		pthread_mutex_lock(&(philo->args->died_status));
+// 		philo->args->died = 1;
+// 		pthread_mutex_unlock(&philo->args->died_status);
+// 		ft_printf_out(philo, "died");
+// 		return (0);
+// 	}
+// 	return (1);
+// }
 int	is_alive(t_philo *philo)
 {
 	if (get_time(philo->tm_lmeal) >= philo->args->t2die_p)
@@ -45,7 +67,8 @@ int	is_alive(t_philo *philo)
 		pthread_mutex_lock(&(philo->args->died_status));
 		philo->args->died = 1;
 		pthread_mutex_unlock(&philo->args->died_status);
-		ft_printf_out(philo, "died");
+		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1,
+			"died");
 		return (0);
 	}
 	return (1);
