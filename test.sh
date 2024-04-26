@@ -14,10 +14,10 @@ do
     # ./philo 4 290 200 100 | grep died
 # the cases below, when the 2 philo simultaneous death can be explained 
 # with PC performance - they r so seldom
-    # ./philo 4 310 200 100 | grep died  # more seldom as 1 per 20 times 2 philos are dieing simultaneously
-    # ./philo 4 390 200 100 | grep died  # 1 time in 10 2 philos die
+    # ./philo 4 310 200 100 | grep died  # more seldom as 1 per 40 times 2 philos are dieing simultaneously
+    # ./philo 4 390 200 100 | grep died  # 1 time in 20 2 philos die
     # ./philo 5 490 200 100 | grep died  # 1 per 30
-    # ./philo 5 590 200 100 | grep died  # 1 per 20-30
+    ./philo 5 590 200 100 | grep died  # 1 per 20
 done
     # everlasting loops: 
     # ./philo 200 260 100 100 
