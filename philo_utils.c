@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/26 16:25:20 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 17:39:27 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,18 +128,15 @@ void	*phl_thrd(t_philo *philo)
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0)
-			ft_msleep(3);
+			ft_msleep(10);
 		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
 		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
 			% philo->args->numbr_p]);
 		if (issomeone_dead(philo->args) || !is_alive(philo))
 			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
-					% philo->args->numbr_p]))
-		{
-			if (!survived_eat_sleep(philo))
-				return (NULL);
-		}
+					% philo->args->numbr_p]) && !survived_eat_sleep(philo))
+			return (NULL);
 		else
 			philoforks_mutexs_unlock(philo);
 		if (!ft_printf_out(philo, "is thinking"))
