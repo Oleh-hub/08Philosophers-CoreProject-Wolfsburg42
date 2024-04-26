@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/26 17:39:27 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 17:55:52 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 	// printf("%l d%d%s\n", get_time(philo->args->time), philo->id + 1, "TEST");
 	// pthread_mutex_unlock(&philo->args->print_mtx);
 	// }									// tracing end
-void	wait4death(t_philo *philo, int i)
+static void	wait4death(t_philo *philo, int i)
 {
 	long	last_breath;
 
@@ -48,7 +48,7 @@ void	wait4death(t_philo *philo, int i)
 // philo takes forks, eats and and than waits - created bcause of norminette
 // RETURNS:
 // (void *)philo or NULL if the gettimeofday fails
-void	*eating(t_philo *philo)
+static void	*eating(t_philo *philo)
 {
 	philo->args->fork[philo->id] = 1;
 	if (!ft_printf_out(philo, "has taken a fork"))
@@ -72,7 +72,7 @@ void	*eating(t_philo *philo)
 // RETURNS:
 // if the philo dies during eating/sleeping NULL is returned
 // otherwise tphilo
-void	*survived_eat_sleep(t_philo *philo)
+static void	*survived_eat_sleep(t_philo *philo)
 {
 	if (!eating(philo))
 		return (NULL);
@@ -90,6 +90,14 @@ void	*survived_eat_sleep(t_philo *philo)
 	// if (issomeone_dead(philo->args)	|| !is_alive(philo))
 	// 	return (NULL);
 	return ((void *)philo);
+}
+
+// jsut lokcs mutexes for both forkes of the philo given as a parameter
+static void	philoforks_mutexs_lock(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
+	pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
+		% philo->args->numbr_p]);
 }
 
 // philosophers life cycle theread simulation
@@ -114,7 +122,6 @@ void	*survived_eat_sleep(t_philo *philo)
 //  code where the the porgram (the philosopher) waits till the mutex(e.g. fork)
 // is freed and does not check if he is already dead. 
 // E.g.	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-
 void	*phl_thrd(t_philo *philo)
 {
 	int		i;
@@ -129,9 +136,7 @@ void	*phl_thrd(t_philo *philo)
 			break ;
 		if (philo->id % 2 && i == 0)
 			ft_msleep(10);
-		pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-		pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
-			% philo->args->numbr_p]);
+		philoforks_mutexs_lock(philo);
 		if (issomeone_dead(philo->args) || !is_alive(philo))
 			return (philoforks_mutexs_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)

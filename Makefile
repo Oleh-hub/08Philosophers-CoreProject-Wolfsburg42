@@ -6,9 +6,10 @@
 NAME	:=	philo
 CC		:=	cc
 SRCS	:=	philo.c 		\
-			 philo_utils.c	\
-			 philo_utils1.c	\
-			 philo_utils2.c	
+			ft_printf_out.c	\
+			philo_utils.c	\
+			philo_utils1.c	\
+			philo_utils2.c	
 
 OBJS	:=	$(SRCS:.c=.o)
 OBJS_DIR:=	obj/
@@ -41,4 +42,5 @@ re : fclean all
 
 norm :
 #	norminette $(SRCS) philo.h
-	norminette philo.c philo_utils.c philo_utils1.c philo_utils2.c philo.h
+	norminette	philo.c ft_printf_out.c philo_utils.c philo_utils1.c	\
+				philo_utils2.c philo.h

@@ -6,46 +6,13 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/26 15:52:33 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/26 18:11:55 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // https://nafuka11.github.io/philosophers-visualizer/
-// recomended border cases to check
-// ./philo 1 1010 500 500
-// ./philo 4 190 200 100 - - -
-// ./philo 4 290 200 100 -
-// ./philo 4 310 200 100 //
-// ./philo 4 390 200 100 //
-// ./philo 5 490 200 100 - -
-// ./philo 5 590 200 100 -
-// The following border cases fails by other students projects like in 115XXX
-// ms, but not im my case:
-// ./philo 200 1010 500 500 // no death evan after 355XXX ms...
-// The tests with following border parameters failed by every other successful 
-// student project I have seen in my case as well:
-// ./philo 200 410 200 200 // fails when run long enough 20465 45XXX 3817 ms...
-// ./philo 200 210 100 100 // fails when run long enough 6563 4145 3438 ms...
 
 #include "philo.h"
-
-// mutexed print out the philosopher's actions
-// void	ft_printf_out(t_philo *philo, char *str)
-// {
-// 	pthread_mutex_lock(&(philo->args->print_mtx));
-// 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
-// 	pthread_mutex_unlock(&philo->args->print_mtx);
-// }
-
-void	*ft_printf_out(t_philo *philo, char *str)
-{
-	pthread_mutex_lock(&(philo->args->print_mtx));
-	if (issomeone_dead(philo->args) || !is_alive(philo))
-		return (pthread_mutex_unlock(&philo->args->print_mtx), NULL);
-	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
-	pthread_mutex_unlock(&philo->args->print_mtx);
-	return (philo);
-}
 
 // check if the philosopher is alive
 // int	is_alive(t_philo *philo)
