@@ -16,7 +16,7 @@ OBJS_DIR:=	obj/
 OBJS_PR	:=	$(addprefix $(OBJS_DIR), $(OBJS))
 # CFLAGS	:=	-Wall -Wextra -Werror -g -pthread
 CFLAGS		=	-Wall -Wextra -Werror -g
-# CLFAGS += -fsanitize=thread
+CLFAGS += -fsanitize=thread
 # CFLAGS +=	-fsanitize=address
 # - malloc 0-zing does not work with this the falg above - use calloc!
 # lldb ./philo 4 410 200 200 200  # debugging from terminal

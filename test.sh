@@ -15,7 +15,7 @@ do
 # the cases below, when the 2 philo simultaneous death can be explained 
 # with PC performance - they r so seldom
     # ./philo 4 310 200 100 | grep died
-    # ./philo 4 390 200 100 | grep died  # 1 per 10
+    ./philo 4 390 200 100 | grep died  # 1 per 10
     # ./philo 5 490 200 100 | grep died  # 1 per 10
     # ./philo 5 590 200 100 | grep died  # 1 per 10
 done
@@ -29,6 +29,6 @@ done
 
 # eval tests
 # ./philo 5 800 200 200 7 # ok
-# ./philo 5 800 200 200 8
+# ./philo 5 800 200 200
 # ./philo 4 410 200 200 # ok
 # ./philo 4 310 200 100 # 1 in 10 case 2 die
