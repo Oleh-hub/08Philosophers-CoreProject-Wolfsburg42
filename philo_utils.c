@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/26 20:23:41 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/27 20:11:33 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,13 @@ static void	wait4death(t_philo *philo, int i)
 // RETURNS:
 // (void *)philo or NULL if the gettimeofday fails
 static void	*eating(t_philo *philo)
-{
+{ 
+	// { //tracing
+	// pthread_mutex_lock(&(philo->args->print_mtx));
+	// // if (philo->id == 4) // tracing
+	// 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "b4 taking forks");	//
+	// pthread_mutex_unlock(&philo->args->print_mtx);
+	// }
 	philo->args->fork[philo->id] = 1;
 	if (!ft_printf_out(philo, "has taken a fork"))
 		return (NULL);
@@ -75,7 +81,7 @@ static void	*eating(t_philo *philo)
 static void	*survived_eat_sleep(t_philo *philo)
 {
 	if (!eating(philo))
-		return (NULL);
+		return (philoforks_mutexs_unlock(philo), NULL);
 	// if (issomeone_dead(philo->args) || !is_alive(philo))
 	// 		return (philoforks_mutexs_unlock(philo), NULL);
 	philo->args->fork[philo->id] = 0;
@@ -96,8 +102,24 @@ static void	*survived_eat_sleep(t_philo *philo)
 static void	philoforks_mutexs_lock(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
+	// { //tracing
+	// 	if (philo->id == 4) // tracing
+	// 	{
+	// 		pthread_mutex_lock(&(philo->args->print_mtx));
+	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "inside philoforks_mutexs_lock()");	//
+	// 		pthread_mutex_unlock(&philo->args->print_mtx);
+	// 	}
+	// }	//tracing end
 	pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
 		% philo->args->numbr_p]);
+	// { //tracing
+	// 	if (philo->id == 4) // tracing
+	// 	{
+	// 		pthread_mutex_lock(&(philo->args->print_mtx));
+	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "end of philoforks_mutexs_lock()");	//
+	// 		pthread_mutex_unlock(&philo->args->print_mtx);
+	// 	}
+	// }	//tracing end
 }
 
 // philosophers life cycle theread simulation
@@ -130,15 +152,31 @@ void	*phl_thrd(t_philo *philo)
 	while (1)
 	{
 		wait4death(philo, i);
-		if (issomeone_dead(philo->args) || !is_alive(philo, 0))
-			return (NULL);
+		// if (issomeone_dead(philo->args) || !is_alive(philo, 0))
+		// 	return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0)
 			ft_msleep(10);
+	// { //tracing
+	// 	if (philo->id == 4) // tracing
+	// 	{
+	// 		pthread_mutex_lock(&(philo->args->print_mtx));
+	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "b4 philoforks_mutexs_lock()");	//
+	// 		pthread_mutex_unlock(&philo->args->print_mtx);
+	// 	}
+	// }	//tracing end
 		philoforks_mutexs_lock(philo);
-		if (issomeone_dead(philo->args) || !is_alive(philo, 0))
-			return (philoforks_mutexs_unlock(philo), NULL);
+	// { //tracing
+	// 	if (philo->id == 4) // tracing
+	// 	{
+	// 		pthread_mutex_lock(&(philo->args->print_mtx));
+	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "after philoforks_mutexs_lock()");	//
+	// 		pthread_mutex_unlock(&philo->args->print_mtx);
+	// 	}
+	// }	//tracing end
+		// if (issomeone_dead(philo->args) || !is_alive(philo, 0))
+		// 	return (philoforks_mutexs_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]) && !survived_eat_sleep(philo))
 			return (NULL);
