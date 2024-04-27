@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/27 20:11:33 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/27 20:40:31 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,23 +158,7 @@ void	*phl_thrd(t_philo *philo)
 			break ;
 		if (philo->id % 2 && i == 0)
 			ft_msleep(10);
-	// { //tracing
-	// 	if (philo->id == 4) // tracing
-	// 	{
-	// 		pthread_mutex_lock(&(philo->args->print_mtx));
-	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "b4 philoforks_mutexs_lock()");	//
-	// 		pthread_mutex_unlock(&philo->args->print_mtx);
-	// 	}
-	// }	//tracing end
 		philoforks_mutexs_lock(philo);
-	// { //tracing
-	// 	if (philo->id == 4) // tracing
-	// 	{
-	// 		pthread_mutex_lock(&(philo->args->print_mtx));
-	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "after philoforks_mutexs_lock()");	//
-	// 		pthread_mutex_unlock(&philo->args->print_mtx);
-	// 	}
-	// }	//tracing end
 		// if (issomeone_dead(philo->args) || !is_alive(philo, 0))
 		// 	return (philoforks_mutexs_unlock(philo), NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
