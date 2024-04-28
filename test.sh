@@ -15,21 +15,20 @@ do
 # the cases below, when the 2 philo simultaneous death can be explained 
 # with PC performance - they r so seldom
     ./philo 4 310 200 100 | grep died
-    # ./philo 4 390 200 100 | grep died
-    # ./philo 5 490 200 100 | grep died
-    # ./philo 5 590 200 100 | grep died
-    # ./philo 4 310 200 100  | grep died
+    ./philo 4 390 200 100 | grep died
+    ./philo 5 490 200 100 | grep died
+    ./philo 5 590 200 100 | grep died
 done
     # everlasting loops:
-    # ./philo 200 260 100 100 # 223k #6k, 173k+ # 15k 38k (
+    # ./philo 200 260 100 100 # two messages is eating
 # the above given subject demand sets the DELTA of project PARAMETERS sensibility to 60 ms
 # therefoe the following tests are too strict and not relevant:
-    # ./philo 200 1010 500 500 # 259k 4 died - 2k 
-    # ./philo 200 410 200 200 # 16k 30, 181 died - 4k - 1k <1k
-    # ./philo 200 210 100 100 # 2k 64 died - 1k #0.3k
+    # ./philo 200 1010 500 500 # 30k died two messages is eating  
+    # ./philo 200 410 200 200 # 4k died && tow is eating mesaages
+    # ./philo 200 210 100 100 # 2k 0.7k died two messages is eating
 
 # eval tests
-# ./philo 5 800 200 200 7 # ok
+# ./philo 5 800 200 200 7 # 2 eateing messageds everywhere
 # ./philo 5 800 200 200
-# ./philo 4 410 200 200 # ok
-# ./philo 4 310 200 100 # 1 in 30 case 2 die
+# ./philo 4 410 200 200
+# ./philo 4 310 200 100

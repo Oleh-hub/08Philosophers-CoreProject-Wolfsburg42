@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/28 17:32:08 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/28 21:13:58 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@
 static void	wait4death(t_philo *philo, int i)
 {
 	long	last_breath;
-
+	
 	if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p
 		|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
 	{
+
 		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
 		if ((i >= 0 && last_breath < philo->args->t2eat_p)
 			|| (philo->args->numbr_p % 2 && philo->id
@@ -151,25 +152,20 @@ void	*phl_thrd(t_philo *philo)
 	i = -1;
 	while (1)
 	{
-		wait4death(philo, i);
-		// if (issomeone_dead(philo->args) || !is_alive(philo, 0))
-		// 	return (NULL);
 		if (++i == philo->args->times_p && philo->args->times_p)
 			break ;
 		if (philo->id % 2 && i == 0)
 			ft_msleep(10);
 		philoforks_mutexs_lock(philo);
-		// if (issomeone_dead(philo->args) || !is_alive(philo, 0))
-		// 	return (philoforks_mutexs_unlock(philo), NULL);
 		// if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 		// 			% philo->args->numbr_p]) && !survived_eat_sleep(philo))
 		// 	return (NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
+			wait4death(philo, i);
 			if (!survived_eat_sleep(philo))
 				return (NULL);
-			
 		}
 		else
 			philoforks_mutexs_unlock(philo);
