@@ -14,7 +14,7 @@ do
     # ./philo 4 290 200 100 | grep died
 # the cases below, when the 2 philo simultaneous death can be explained 
 # with PC performance - they r so seldom
-    # ./philo 4 310 200 100 | grep died
+    ./philo 4 310 200 100 | grep died
     # ./philo 4 390 200 100 | grep died
     # ./philo 5 490 200 100 | grep died
     # ./philo 5 590 200 100 | grep died
