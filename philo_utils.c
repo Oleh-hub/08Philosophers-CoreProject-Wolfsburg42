@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 18:23:39 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 18:45:50 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 static void	wait4death(t_philo *philo, int i)
 {
 	long	last_breath;
-	
+
 	if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p
 		|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
 	{
@@ -42,7 +42,7 @@ static void	wait4death(t_philo *philo, int i)
 // RETURNS:
 // (void *)philo or NULL if the gettimeofday fails
 static void	*eating(t_philo *philo)
-{ 
+{
 	philo->args->fork[philo->id] = 1;
 	if (!ft_printf_out(philo, "has taken a fork"))
 		return (NULL);
@@ -136,8 +136,7 @@ void	*phl_thrd(t_philo *philo)
 		if (philo->args->t2die_p < 2 * philo->args->t2eat_p)
 			ft_msleep(philo->args->t2die_p - get_time(philo->tm_lmeal));
 		if (issomeone_dead(philo->args) || !is_alive(philo, 1))
-			break;
-		// probable place to insure correct death for ./philo 4 301-399 200 100 
+			break ;
 	}
 	return (NULL);
 }
