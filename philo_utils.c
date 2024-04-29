@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 14:36:06 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 18:23:39 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,11 @@ void	*phl_thrd(t_philo *philo)
 			philoforks_mutexs_unlock(philo);
 		if (!ft_printf_out(philo, "is thinking"))
 			return (NULL);
+		if (philo->args->t2die_p < 2 * philo->args->t2eat_p)
+			ft_msleep(philo->args->t2die_p - get_time(philo->tm_lmeal));
+		if (issomeone_dead(philo->args) || !is_alive(philo, 1))
+			break;
+		// probable place to insure correct death for ./philo 4 301-399 200 100 
 	}
 	return (NULL);
 }

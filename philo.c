@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 08:43:41 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 17:12:53 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int	is_alive(t_philo *philo, int isprintmutexed)
 		{ //
 			printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1,
 				"died");
-			; //
 		} //
 		else
 		{

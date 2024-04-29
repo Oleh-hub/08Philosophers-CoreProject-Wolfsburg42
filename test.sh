@@ -27,7 +27,7 @@ done
     # ./philo 200 210 100 100 # 2k 
 
 # eval tests
-# ./philo 5 800 200 200 7 # 2 eateing messageds everywhere
+# ./philo 5 800 200 200 7
 # ./philo 5 800 200 200
 # ./philo 4 410 200 200
 # ./philo 4 310 200 100
