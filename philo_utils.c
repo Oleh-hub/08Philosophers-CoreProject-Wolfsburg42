@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 13:47:27 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 14:36:06 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,6 @@
 // (time_to_die < time_to_eat + time_to_sleep or time_to_die < 2 * time_to_eat)
 // 2 - during other philos eating in case the number_of_philosophers is uneven
 // (numbr_p % 2 && time_to_die < 3 * time_to_eat)
-	// DEBIGGING:
-	// if (philo->id == 3 || philo->id == 1) // tracing start
-	// {
-	// pthread_mutex_lock(&(philo->args->print_mtx));
-	// printf("%l d%d%s\n", get_time(philo->args->time), philo->id + 1, "TEST");
-	// pthread_mutex_unlock(&philo->args->print_mtx);
-	// }									// tracing end
 static void	wait4death(t_philo *philo, int i)
 {
 	long	last_breath;
@@ -75,8 +68,6 @@ static void	*survived_eat_sleep(t_philo *philo)
 {
 	if (!eating(philo))
 		return (philoforks_mutexs_unlock(philo), NULL);
-	// if (issomeone_dead(philo->args) || !is_alive(philo))
-	// 		return (philoforks_mutexs_unlock(philo), NULL);
 	philo->args->fork[philo->id] = 0;
 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 0;
 	philoforks_mutexs_unlock(philo);
@@ -86,8 +77,6 @@ static void	*survived_eat_sleep(t_philo *philo)
 		ft_msleep(philo->args->t2slp_p);
 	else
 		ft_msleep((philo->args->t2die_p - philo->args->t2eat_p));
-	// if (issomeone_dead(philo->args)	|| !is_alive(philo))
-	// 	return (NULL);
 	return ((void *)philo);
 }
 
@@ -133,9 +122,6 @@ void	*phl_thrd(t_philo *philo)
 		if (philo->id % 2 && i == 0)
 			ft_msleep(10);
 		philoforks_mutexs_lock(philo);
-		// if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
-		// 			% philo->args->numbr_p]) && !survived_eat_sleep(philo))
-		// 	return (NULL);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
