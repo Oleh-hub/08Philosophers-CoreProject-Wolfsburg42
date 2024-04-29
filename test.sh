@@ -1,11 +1,21 @@
-# Subject"Do not test with time_to_die or time_to_eat or time_to_sleep set to
-#  values lower than 60 ms."
 
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    test.sh                                            :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: oruban <oruban@student.42.fr>              +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/04/29 19:06:42 by oruban            #+#    #+#              #
+#    Updated: 2024/04/29 19:06:43 by oruban           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
 #!/bin/bash
-
+# border tests for the philosophers project
+# Subject"Do not test with time_to_die or time_to_eat or time_to_sleep set to
+#  values lower than 60 ms."
 # ./philo 1 800 200 200
-
 # leaks --atExit -- ./philo 4 310 200 100
 for i in {1..10}
 do
