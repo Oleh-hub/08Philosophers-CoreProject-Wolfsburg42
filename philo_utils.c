@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/28 21:13:58 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 13:26:01 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,15 @@ static void	wait4death(t_philo *philo, int i)
 	if (philo->args->t2die_p < philo->args->t2eat_p + philo->args->t2slp_p
 		|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
 	{
-
 		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-		if ((i >= 0 && last_breath < philo->args->t2eat_p)
+		// if ((i >= 0 && last_breath < philo->args->t2eat_p)
+		if ((i > 0 && last_breath < philo->args->t2eat_p)
 			|| (philo->args->numbr_p % 2 && philo->id
 				== philo->args->numbr_p - 2))
 			ft_msleep(last_breath);
 	}
-	if (i >= 0 && philo->args->numbr_p % 2
+	// if (i >= 0 && philo->args->numbr_p % 2
+	if (i > 0 && philo->args->numbr_p % 2
 		&& philo->args->t2die_p < 3 * philo->args->t2eat_p)
 	{
 		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
@@ -51,13 +52,8 @@ static void	wait4death(t_philo *philo, int i)
 // (void *)philo or NULL if the gettimeofday fails
 static void	*eating(t_philo *philo)
 { 
-	// { //tracing
-	// pthread_mutex_lock(&(philo->args->print_mtx));
-	// // if (philo->id == 4) // tracing
-	// 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "b4 taking forks");	//
-	// pthread_mutex_unlock(&philo->args->print_mtx);
-	// }
 	philo->args->fork[philo->id] = 1;
+	// tracing(philo, "DEBUG: inside eating()"); // tracing
 	if (!ft_printf_out(philo, "has taken a fork"))
 		return (NULL);
 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
@@ -81,6 +77,7 @@ static void	*eating(t_philo *philo)
 // otherwise tphilo
 static void	*survived_eat_sleep(t_philo *philo)
 {
+	// tracing (philo, "DEBUG: inside survived_eat_sleep()"); // tracing
 	if (!eating(philo))
 		return (philoforks_mutexs_unlock(philo), NULL);
 	// if (issomeone_dead(philo->args) || !is_alive(philo))
@@ -163,7 +160,9 @@ void	*phl_thrd(t_philo *philo)
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
+			// tracing (philo, "DEBUG: phl_thrd() b4 wait4death()");
 			wait4death(philo, i);
+			// tracing (philo, "DEBUG: after b4 wait4death()");
 			if (!survived_eat_sleep(philo))
 				return (NULL);
 		}
