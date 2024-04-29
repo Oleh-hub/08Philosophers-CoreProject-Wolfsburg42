@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 15:14:18 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/27 18:16:33 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 08:43:41 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	issomeone_dead(t_args *args)
 // the case when there is only one philosopher (args.numbr_p == 1)
 void	onephilo_case(t_args *args)
 {
-	printf("0 1 has taken the left fork\n");
+	printf("0 1 has taken a fork\n");
 	ft_msleep(args->t2die_p);
 	printf("%i 1 has died\n", args->t2die_p);
 	args_destroy(args);

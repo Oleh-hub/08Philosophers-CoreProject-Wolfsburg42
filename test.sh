@@ -10,14 +10,16 @@
 for i in {1..10}
 do
    echo " "
-    # ./philo 4 190 200 100 | grep died
-    # ./philo 4 290 200 100 | grep died
+    # ./philo 4 299 200 100 # no indication of getting forks, eating. just "died"
+    # ./philo 4 190 200 100 | grep died # no indication of getting forks, eating. just "died"
+    # ./philo 4 290 200 100 | grep died # no indication of getting forks, eating. just "died"
 # the cases below, when the 2 philo simultaneous death can be explained 
 # with PC performance - they r so seldom
     ./philo 4 310 200 100 | grep died
     ./philo 4 390 200 100 | grep died
-    ./philo 5 490 200 100 | grep died
-    ./philo 5 590 200 100 | grep died
+    ./philo 5 599 200 100  # no indication of getting forks, eating. just "died"
+    ./philo 5 590 200 100 | grep died # no indication of getting forks, eating. just "died"
+    ./philo 5 490 200 100 | grep died # no indication of getting forks, eating. just "died"
 done
     # everlasting loops:
     # ./philo 200 260 100 100 # two messages is eating
