@@ -41,6 +41,5 @@ fclean : clean
 re : fclean all
 
 norm :
-#	norminette $(SRCS) philo.h
 	norminette	philo.c ft_printf_out.c philo_utils.c philo_utils1.c	\
 				philo_utils2.c philo.h

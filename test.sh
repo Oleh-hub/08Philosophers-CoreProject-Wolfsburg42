@@ -17,16 +17,16 @@
 #  values lower than 60 ms."
 # ./philo 1 800 200 200
 # leaks --atExit -- ./philo 4 310 200 100
-for i in {1..10}
+for i in {1..1}
 do
    echo " "
-    ./philo 4 199 200 100 | grep died
-    ./philo 4 290 200 100 | grep died 
-    ./philo 4 301 200 100 | grep died
-    ./philo 4 399 200 100 | grep died
-    ./philo 5 599 200 100 | grep died  
-    ./philo 5 590 200 100 | grep died 
-    ./philo 5 490 200 100 | grep died 
+   ./philo 4 199 200 100 #| grep died
+   ./philo 4 290 200 100 #| grep died 
+   ./philo 4 301 200 100 #| grep died
+   ./philo 4 399 200 100 #| grep died
+   ./philo 5 599 200 100 #| grep died  
+   ./philo 5 590 200 100 #| grep died 
+   ./philo 5 490 200 100 #| grep died 
 done
     # ./philo 5 490 200 100
 # everlasting loops:
