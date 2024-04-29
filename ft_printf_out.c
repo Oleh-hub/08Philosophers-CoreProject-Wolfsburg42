@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/26 18:06:11 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 18:45:07 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 18:56:16 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,4 +31,12 @@ void	*tracing(t_philo *philo, char *str)
 	printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, str);
 	pthread_mutex_unlock(&philo->args->print_mtx);
 	return (philo);
+}
+
+// just locks mutexes for both forkes of the philo given as a parameter
+void	philoforks_mutexs_lock(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
+	pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
+		% philo->args->numbr_p]);
 }

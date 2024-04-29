@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 18:45:50 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 19:03:25 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,13 @@ static void	*survived_eat_sleep(t_philo *philo)
 	return ((void *)philo);
 }
 
-// jsut lokcs mutexes for both forkes of the philo given as a parameter
-static void	philoforks_mutexs_lock(t_philo *philo)
+//thread norminated till 25 lines :)
+static void	*wait_eat_sleep(t_philo *philo, int i)
 {
-	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-	pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
-		% philo->args->numbr_p]);
+	wait4death(philo, i);
+	if (!survived_eat_sleep(philo))
+		return (NULL);
+	return ((void *)philo);
 }
 
 // philosophers life cycle theread simulation
@@ -124,11 +125,7 @@ void	*phl_thrd(t_philo *philo)
 		philoforks_mutexs_lock(philo);
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
-		{
-			wait4death(philo, i);
-			if (!survived_eat_sleep(philo))
-				return (NULL);
-		}
+			wait_eat_sleep(philo, i);
 		else
 			philoforks_mutexs_unlock(philo);
 		if (!ft_printf_out(philo, "is thinking"))

@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:39:54 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 18:46:16 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 18:56:57 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,9 @@ void	*phl_thrd(t_philo *philo);
 // philo.c
 // void	ft_printf_out(t_philo *philo, char *str);
 void	*ft_printf_out(t_philo *philo, char *str);
-int		issomeone_dead(t_args *args);
 // int		is_alive(t_philo *philo);
 void	*tracing(t_philo *philo, char *str); // tracing function
+void	philoforks_mutexs_lock(t_philo *philo);
+int		issomeone_dead(t_args *args);
 int		is_alive(t_philo *philo, int isprintmutexed);
 #endif /* PHILO_H */
