@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 13:26:01 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/29 13:47:27 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,11 @@ static void	wait4death(t_philo *philo, int i)
 		|| philo->args->t2die_p < 2 * philo->args->t2eat_p)
 	{
 		last_breath = philo->args->t2die_p - get_time(philo->tm_lmeal);
-		// if ((i >= 0 && last_breath < philo->args->t2eat_p)
 		if ((i > 0 && last_breath < philo->args->t2eat_p)
 			|| (philo->args->numbr_p % 2 && philo->id
 				== philo->args->numbr_p - 2))
 			ft_msleep(last_breath);
 	}
-	// if (i >= 0 && philo->args->numbr_p % 2
 	if (i > 0 && philo->args->numbr_p % 2
 		&& philo->args->t2die_p < 3 * philo->args->t2eat_p)
 	{
@@ -53,7 +51,6 @@ static void	wait4death(t_philo *philo, int i)
 static void	*eating(t_philo *philo)
 { 
 	philo->args->fork[philo->id] = 1;
-	// tracing(philo, "DEBUG: inside eating()"); // tracing
 	if (!ft_printf_out(philo, "has taken a fork"))
 		return (NULL);
 	philo->args->fork[(philo->id + 1) % philo->args->numbr_p] = 1;
@@ -61,7 +58,6 @@ static void	*eating(t_philo *philo)
 		return (NULL);
 	if (gettimeofday(&philo->tm_lmeal, NULL) == -1)
 		return (NULL);
-	ft_printf_out(philo, "is eating");
 	if (!ft_printf_out(philo, "is eating"))
 		return (NULL);
 	if (philo->args->t2eat_p < philo->args->t2die_p)
@@ -77,7 +73,6 @@ static void	*eating(t_philo *philo)
 // otherwise tphilo
 static void	*survived_eat_sleep(t_philo *philo)
 {
-	// tracing (philo, "DEBUG: inside survived_eat_sleep()"); // tracing
 	if (!eating(philo))
 		return (philoforks_mutexs_unlock(philo), NULL);
 	// if (issomeone_dead(philo->args) || !is_alive(philo))
@@ -100,24 +95,8 @@ static void	*survived_eat_sleep(t_philo *philo)
 static void	philoforks_mutexs_lock(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->args->fork_m[philo->id]);
-	// { //tracing
-	// 	if (philo->id == 4) // tracing
-	// 	{
-	// 		pthread_mutex_lock(&(philo->args->print_mtx));
-	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "inside philoforks_mutexs_lock()");	//
-	// 		pthread_mutex_unlock(&philo->args->print_mtx);
-	// 	}
-	// }	//tracing end
 	pthread_mutex_lock(&philo->args->fork_m[(philo->id + 1)
 		% philo->args->numbr_p]);
-	// { //tracing
-	// 	if (philo->id == 4) // tracing
-	// 	{
-	// 		pthread_mutex_lock(&(philo->args->print_mtx));
-	// 		printf("%ld %d %s\n", get_time(philo->args->time), philo->id + 1, "end of philoforks_mutexs_lock()");	//
-	// 		pthread_mutex_unlock(&philo->args->print_mtx);
-	// 	}
-	// }	//tracing end
 }
 
 // philosophers life cycle theread simulation
@@ -160,9 +139,7 @@ void	*phl_thrd(t_philo *philo)
 		if (!(philo->args->fork[philo->id] || philo->args->fork[(philo->id + 1)
 					% philo->args->numbr_p]))
 		{
-			// tracing (philo, "DEBUG: phl_thrd() b4 wait4death()");
 			wait4death(philo, i);
-			// tracing (philo, "DEBUG: after b4 wait4death()");
 			if (!survived_eat_sleep(philo))
 				return (NULL);
 		}
