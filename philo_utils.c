@@ -6,7 +6,7 @@
 /*   By: oruban <oruban@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 16:40:04 by oruban            #+#    #+#             */
-/*   Updated: 2024/04/29 19:03:25 by oruban           ###   ########.fr       */
+/*   Updated: 2024/04/30 07:57:30 by oruban           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ void	*phl_thrd(t_philo *philo)
 			return (NULL);
 		if (philo->args->t2die_p < 2 * philo->args->t2eat_p)
 			ft_msleep(philo->args->t2die_p - get_time(philo->tm_lmeal));
-		if (issomeone_dead(philo->args) || !is_alive(philo, 1))
+		if (issomeone_dead(philo->args) || !is_alive(philo, 0))
 			break ;
 	}
 	return (NULL);
